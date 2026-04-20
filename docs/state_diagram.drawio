@@ -1,0 +1,71 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="1021" dy="572" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-2" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="250" />
+            </Array>
+            <mxPoint x="360" y="150" as="sourcePoint" />
+            <mxPoint x="360" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-3" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" value="下書き&lt;br&gt;（ draft ）" vertex="1">
+          <mxGeometry height="70" width="170" x="280" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-5" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;" target="WIyWlLk6GJQsqaUBKTNV-7" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;review&lt;br&gt;(result: ok, role: approver)&lt;/font&gt;">
+          <mxGeometry relative="1" x="0.027" y="95" as="geometry">
+            <mxPoint x="1" as="offset" />
+            <mxPoint x="444.9999999999998" y="315" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-7" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="レビュー完了&lt;br&gt;（ reviewed ）" vertex="1">
+          <mxGeometry height="70" width="170" x="630" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="5Qg3omjBz2Lr3Q5ugMZ0-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="提出" vertex="1">
+          <mxGeometry height="30" width="60" x="360" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="5Qg3omjBz2Lr3Q5ugMZ0-1" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" value="差し戻し&lt;br&gt;（&amp;nbsp;revision_required ）" vertex="1">
+          <mxGeometry height="70" width="170" x="280" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="5Qg3omjBz2Lr3Q5ugMZ0-5" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="5Qg3omjBz2Lr3Q5ugMZ0-1" style="endArrow=block;html=1;rounded=0;endFill=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="z8vB0YRgslVx4XLKnsAd-0" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="595" />
+              <mxPoint x="240" y="315" />
+            </Array>
+            <mxPoint x="120" y="610" as="sourcePoint" />
+            <mxPoint x="270" y="315" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5Qg3omjBz2Lr3Q5ugMZ0-6" parent="WIyWlLk6GJQsqaUBKTNV-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="修正後&lt;br&gt;再提出&lt;br&gt;（round +1）" vertex="1">
+          <mxGeometry height="30" width="100" x="130" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="5Qg3omjBz2Lr3Q5ugMZ0-7" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="z8vB0YRgslVx4XLKnsAd-0" style="rounded=0;html=1;jettySize=auto;orthogonalLoop=1;fontSize=11;endArrow=block;endFill=0;endSize=8;strokeWidth=1;shadow=0;labelBackgroundColor=none;edgeStyle=orthogonalEdgeStyle;exitX=0.457;exitY=1.029;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="352" />
+            </Array>
+            <mxPoint x="360" y="370" as="sourcePoint" />
+            <mxPoint x="360" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5Qg3omjBz2Lr3Q5ugMZ0-8" parent="WIyWlLk6GJQsqaUBKTNV-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="review(result: ng, role: approver)" vertex="1">
+          <mxGeometry height="30" width="190" x="370" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="z8vB0YRgslVx4XLKnsAd-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div&gt;レビュー中&lt;/div&gt;&lt;div&gt;（ reviewing ）&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="280" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="z8vB0YRgslVx4XLKnsAd-8" parent="WIyWlLk6GJQsqaUBKTNV-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="review(result: uneasy, role: approver)" vertex="1">
+          <mxGeometry height="30" width="210" x="370" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="nnSc-XpuVmvT1f5wayUO-0" parent="WIyWlLk6GJQsqaUBKTNV-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="※ 状態遷移は approver の review のみが発生させる" vertex="1">
+          <mxGeometry height="30" width="290" x="420" y="240" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
