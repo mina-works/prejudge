@@ -10,7 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_20_072920) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_24_010331) do
+  create_table "artifact_reviewers", force: :cascade do |t|
+    t.integer "artifact_id", null: false
+    t.integer "user_id", null: false
+    t.integer "role", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["artifact_id", "user_id"], name: "index_artifact_reviewers_on_artifact_id_and_user_id", unique: true
+    t.index ["artifact_id"], name: "index_artifact_reviewers_on_artifact_id"
+    t.index ["user_id"], name: "index_artifact_reviewers_on_user_id"
+  end
+
+  create_table "artifacts", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.integer "creator_id", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "current_round", default: 1, null: false
+    t.datetime "review_deadline"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_artifacts_on_creator_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -18,4 +41,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_20_072920) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "artifact_reviewers", "artifacts"
+  add_foreign_key "artifact_reviewers", "users"
+  add_foreign_key "artifacts", "users", column: "creator_id"
 end
