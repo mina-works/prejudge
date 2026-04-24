@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  artifact: one
+  user: one
+  result: 1
+  round: 1
+  comment: MyText
+
+two:
+  artifact: two
+  user: two
+  result: 1
+  round: 1
+  comment: MyText
