@@ -2,6 +2,8 @@ class Review < ApplicationRecord
   belongs_to :artifact
   belongs_to :user
 
+  has_many :review_issues, dependent: :destroy
+
   enum result: {
     ok: 0,
     uneasy: 1,
