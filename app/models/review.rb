@@ -22,6 +22,9 @@ class Review < ApplicationRecord
   # 最終的な差し戻し権限はapproverのみが持つ
   validate :reviewer_cannot_select_ng
 
+  # reviewがokの場合はissueを持てない
+  validate :ok_review_cannot_have_issues
+
   # approverのreview結果に応じてartifact.statusを更新する
   # reviewerのreviewはstatusに影響しない
   after_create :update_artifact_status
@@ -52,6 +55,13 @@ class Review < ApplicationRecord
     return if approver?
 
     errors.add(:result, "reviewerはngを選択できません")
+  end
+
+  def ok_review_cannot_have_issues
+    return unless ok?
+    return if review_issues.empty?
+
+    errors.add(:base, "ok reviewにはissueを登録できません")
   end
 
   def update_artifact_status
