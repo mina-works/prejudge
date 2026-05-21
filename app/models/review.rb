@@ -5,6 +5,8 @@ class Review < ApplicationRecord
   # reviewに紐づく違和感選択
   has_many :review_issues, dependent: :destroy
 
+  accepts_nested_attributes_for :review_issues
+
   enum result: {
     ok: 0,
     uneasy: 1,
