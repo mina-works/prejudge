@@ -11,6 +11,17 @@
       Review.results.keys.map { |k| [k, k] } %>
   </div>
 
+  <%= form.fields_for :review_issues do |issue_form| %>
+
+    <div>
+      <%= issue_form.label :issue_type %>
+
+      <%= issue_form.select :issue_type,
+        ReviewIssue.issue_types.keys.map { |k| [k, k] } %>
+    </div>
+
+  <% end %>
+
 
   <div>
     <%= form.label :comment %>

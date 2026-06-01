@@ -2,7 +2,7 @@ class ReviewsController < ApplicationController
   def new
     @review = Review.new
 
-    # @review.review_issues.build
+    @review.review_issues.build
   end
 
   def create
@@ -24,7 +24,7 @@ class ReviewsController < ApplicationController
       :user_id,
       :result,
       :comment,
-      # review_issues_attributes: [:issue_type]
+      review_issues_attributes: [:issue_type]
     )
   end
 end
