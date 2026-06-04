@@ -1,0 +1,9 @@
+ja:
+  enums:
+    review_issue:
+      issue_type:
+        wrong_atmosphere: "雰囲気が想定と違う"
+        wrong_target: "対象者に合っていない"
+        tone_mismatch: "トーンが合っていない"
+        too_much_or_little_info: "情報量の過不足"
+        direction_issue: "方向性に問題がある"

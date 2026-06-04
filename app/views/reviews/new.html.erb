@@ -15,10 +15,17 @@
     <p>違和感</p>
 
     <% ReviewIssue.issue_types.keys.each do |issue_type| %>
-      <%= check_box_tag "review[issue_types][]",
-        issue_type %>
+      <%= check_box_tag(
+        "review[issue_types][]",
+        issue_type,
+        false,
+        id: issue_type
+      ) %>
 
-      <%= label_tag issue_type %>
+      <%= label_tag(
+        issue_type,
+        ReviewIssue.issue_type_label(issue_type)
+      ) %>
 
       <br>
     <% end %>
