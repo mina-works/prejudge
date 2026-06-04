@@ -3,7 +3,7 @@
 <%= form_with model: @review do |form| %>
 
   <%= form.hidden_field :artifact_id, value: Artifact.first.id %>
-  <%= form.hidden_field :user_id, value: User.last.id %>
+  <%= form.hidden_field :user_id, value: User.first.id %>
 
   <div>
     <%= form.label :result %>
@@ -11,16 +11,18 @@
       Review.results.keys.map { |k| [k, k] } %>
   </div>
 
-  <%= form.fields_for :review_issues do |issue_form| %>
+  <div>
+    <p>違和感</p>
 
-    <div>
-      <%= issue_form.label :issue_type %>
+    <% ReviewIssue.issue_types.keys.each do |issue_type| %>
+      <%= check_box_tag "review[issue_types][]",
+        issue_type %>
 
-      <%= issue_form.select :issue_type,
-        ReviewIssue.issue_types.keys.map { |k| [k, k] } %>
-    </div>
+      <%= label_tag issue_type %>
 
-  <% end %>
+      <br>
+    <% end %>
+  </div>
 
 
   <div>

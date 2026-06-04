@@ -1,30 +1,37 @@
 class ReviewsController < ApplicationController
   def new
     @review = Review.new
-
-    @review.review_issues.build
   end
 
   def create
-    @review = Review.new(review_params)
-
-    if @review.save
-      # redirect_to root_path
-      redirect_to new_review_path
-    else
-      render :new, status: :unprocessable_entity
-    end
-  end
-
-  private
-
-  def review_params
-    params.require(:review).permit(
+    permitted_review = params.require(:review).permit(
       :artifact_id,
       :user_id,
       :result,
       :comment,
-      review_issues_attributes: [:issue_type]
+      issue_types: []
     )
+
+    issue_types = permitted_review.delete(:issue_types)
+
+    @review = Review.new(permitted_review)
+
+    begin
+      Review.transaction do
+        @review.save!
+
+        @review.create_review_issues(
+          issue_types
+        )
+      end
+
+      # redirect_to root_path
+      redirect_to new_review_path
+
+    rescue ActiveRecord::RecordInvalid => e
+      p e.message
+      render :new, status: :unprocessable_entity
+    end
   end
+
 end

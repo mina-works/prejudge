@@ -5,7 +5,6 @@ class Review < ApplicationRecord
   # reviewに紐づく違和感選択
   has_many :review_issues, dependent: :destroy
 
-  accepts_nested_attributes_for :review_issues
 
   enum result: {
     ok: 0,
@@ -30,6 +29,15 @@ class Review < ApplicationRecord
   # approverのreview結果に応じてartifact.statusを更新する
   # reviewerのreviewはstatusに影響しない
   after_create :update_artifact_status
+
+  # ReviewIssue を作る
+  def create_review_issues(issue_types)
+    issue_types&.each do |issue_type|
+      review_issues.create!(
+        issue_type: issue_type
+      )
+    end
+  end
 
   private
 
