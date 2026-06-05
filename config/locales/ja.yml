@@ -1,5 +1,10 @@
 ja:
   enums:
+    review:
+      result:
+        ok: "OK"
+        uneasy: "違和感あり"
+        ng: "NG"
     review_issue:
       issue_type:
         wrong_atmosphere: "雰囲気が想定と違う"

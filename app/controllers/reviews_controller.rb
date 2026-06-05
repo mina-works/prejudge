@@ -29,7 +29,11 @@ class ReviewsController < ApplicationController
       redirect_to new_review_path
 
     rescue ActiveRecord::RecordInvalid => e
-      p e.message
+      @review.errors.add(
+        :base,
+        e.record.errors.full_messages.join(", ")
+      )
+      
       render :new, status: :unprocessable_entity
     end
   end

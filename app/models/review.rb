@@ -30,6 +30,13 @@ class Review < ApplicationRecord
   # reviewerのreviewはstatusに影響しない
   after_create :update_artifact_status
 
+  # result(enum)を日本語ラベルに変換する
+  def self.result_label(result)
+    I18n.t(
+      "enums.review.result.#{result}"
+    )
+  end
+
   # ReviewIssue を作る
   def create_review_issues(issue_types)
     issue_types&.each do |issue_type|
@@ -64,14 +71,14 @@ class Review < ApplicationRecord
     return unless ng?
     return if approver?
 
-    errors.add(:result, "reviewerはngを選択できません")
+    errors.add(:result, "レビュアーはNGを選択できません")
   end
 
   def ok_review_cannot_have_issues
     return unless ok?
     return if review_issues.empty?
 
-    errors.add(:base, "ok reviewにはissueを登録できません")
+    errors.add(:base, "OKを選択したレビューには違和感を登録できません")
   end
 
   def update_artifact_status
