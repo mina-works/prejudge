@@ -1,0 +1,20 @@
+<h1>Review Detail</h1>
+
+<p>
+  Result:
+  <%= @review.result %>
+</p>
+
+<%# Issue一覧表示 %>
+<% @review.review_issues.each do |issue| %>
+  <p>
+    <%= ReviewIssue.issue_type_label(
+      issue.issue_type
+    ) %>
+  </p>
+<% end %>
+
+<p>
+  Comment:
+  <%= @review.comment %>
+</p>

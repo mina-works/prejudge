@@ -25,8 +25,7 @@ class ReviewsController < ApplicationController
         )
       end
 
-      # redirect_to root_path
-      redirect_to new_review_path
+      redirect_to review_path(@review)
 
     rescue ActiveRecord::RecordInvalid => e
       @review.errors.add(
@@ -36,6 +35,10 @@ class ReviewsController < ApplicationController
       
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def show
+    @review = Review.find(params[:id])
   end
 
 end
