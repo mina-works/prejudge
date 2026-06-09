@@ -20,7 +20,7 @@
 <%= form_with model: @review do |form| %>
 
   <%= form.hidden_field :artifact_id, value: Artifact.first.id %>
-  <%= form.hidden_field :user_id, value: User.last.id %>
+  <%= form.hidden_field :user_id, value: User.first.id %>
 
   <%# 判断結果 %>
   <div>
