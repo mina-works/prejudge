@@ -1,8 +1,13 @@
 <h1>Review Detail</h1>
 
 <p>
+  レビューした人:
+  <%= @review.user.name %>
+</p>
+
+<p>
   Result:
-  <%= @review.result %>
+  <%= @review.result_label %>
 </p>
 
 <%# Issue一覧表示 %>
@@ -18,3 +23,5 @@
   Comment:
   <%= @review.comment %>
 </p>
+
+<%= link_to "一覧へ戻る", reviews_path %>

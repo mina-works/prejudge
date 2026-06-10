@@ -1,12 +1,10 @@
-<h1>Reviews</h1>
+<h1>レビュー一覧</h1>
 
 <% @reviews.each do |review| %>
   <div>
     <%= link_to review.id,
       review_path(review) %>
 
-    <%= Review.result_label(
-      review.result
-    ) %>
+    <%= review.result_label %>
   </div>
 <% end %>

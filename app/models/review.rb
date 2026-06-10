@@ -12,27 +12,38 @@ class Review < ApplicationRecord
     ng: 2
   }
 
+
   # review作成時点のartifact.current_roundを保持する
   # 過去review履歴を固定保存するため、初回のみセットする
   before_validation :set_round
 
+
   # review履歴保護のため、過去roundのreview編集を禁止する
   validate :prevent_edit_past_review, on: :update
+
 
   # reviewerはng（差し戻し）不可
   # 最終的な差し戻し権限はapproverのみが持つ
   validate :reviewer_cannot_select_ng
 
+
   # approverのreview結果に応じてartifact.statusを更新する
   # reviewerのreviewはstatusに影響しない
   after_create :update_artifact_status
 
-  # result(enum)を日本語ラベルに変換する
+
+  # 選択肢生成用：result(enum)を日本語ラベルに変換する
   def self.result_label(result)
     I18n.t(
       "enums.review.result.#{result}"
     )
   end
+
+  # 表示用：result(enum)を日本語ラベルに変換する
+  def result_label
+    self.class.result_label(result)
+  end
+
 
   # ReviewIssue を作る
   def create_review_issues(issue_types)
