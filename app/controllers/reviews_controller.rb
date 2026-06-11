@@ -2,6 +2,10 @@ class ReviewsController < ApplicationController
   def index
     @reviews = Review.all
   end
+
+  def show
+    @review = Review.find(params[:id])
+  end
   
   def new
     @review = Review.new
@@ -39,10 +43,6 @@ class ReviewsController < ApplicationController
       
       render :new, status: :unprocessable_entity
     end
-  end
-
-  def show
-    @review = Review.find(params[:id])
   end
 
 end

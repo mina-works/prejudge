@@ -9,4 +9,5 @@ Rails.application.routes.draw do
   # root "posts#index"
   
   resources :reviews, only: [:index, :new, :create, :show]
+  resources :artifacts, only: [:index, :new, :create, :show, :destroy]
 end

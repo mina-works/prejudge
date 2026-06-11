@@ -1,5 +1,11 @@
 ja:
   enums:
+    artifact:
+      status:
+        draft: 下書き
+        reviewing: レビュー中
+        revision_required: 修正が必要
+        reviewed: レビュー済み
     review:
       result:
         ok: "OK"

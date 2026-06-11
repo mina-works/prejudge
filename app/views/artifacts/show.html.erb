@@ -1,0 +1,33 @@
+<h1>成果物　詳細</h1>
+
+<p>
+  タイトル:
+  <%= @artifact.title %>
+</p>
+
+<p>
+  制作者:
+  <%= @artifact.creator.name %>
+</p>
+
+<p>
+  説明:
+  <%= @artifact.description %>
+</p>
+
+<p>
+  ステータス:
+  <%= @artifact.status_label %>
+</p>
+
+<p>
+  round:
+  <%= @artifact.current_round %>
+</p>
+
+<p>
+  作成日:
+  <%= @artifact.created_at %>
+</p>
+
+<%= link_to "一覧へ戻る", artifacts_path %>

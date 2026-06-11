@@ -1,0 +1,17 @@
+<h1>成果物　一覧</h1>
+
+<% @artifacts.each do |artifact| %>
+  <div>
+    <%= link_to artifact.title,
+      artifact_path(artifact) %>
+
+    <p>
+      ステータス:
+      <%= artifact.status_label %>
+    </p>
+
+    <p>round:
+      <%= artifact.current_round %>
+    </p>
+  </div>
+<% end %>
