@@ -17,10 +17,9 @@
 
 <% end %>
 
-<%= form_with model: @review do |form| %>
+<%= form_with model: [@artifact, @review] do |form| %>
 
-  <%= form.hidden_field :artifact_id, value: Artifact.first.id %>
-  <%= form.hidden_field :user_id, value: User.first.id %>
+  <%= form.hidden_field :user_id, value: User.second.id %>
 
   <%# 判断結果 %>
   <div>
@@ -62,3 +61,6 @@
   </div>
 
 <% end %>
+
+<%= link_to "詳細へ戻る",
+  artifact_path(@artifact) %>

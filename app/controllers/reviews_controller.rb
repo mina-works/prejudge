@@ -8,12 +8,18 @@ class ReviewsController < ApplicationController
   end
   
   def new
-    @review = Review.new
+    @artifact = Artifact.find(
+      params[:artifact_id]
+    )
+    
+    @review = @artifact.reviews.build
   end
 
   def create
+    @artifact = Artifact.find(
+      params[:artifact_id]
+    )
     permitted_review = params.require(:review).permit(
-      :artifact_id,
       :user_id,
       :result,
       :comment,
@@ -22,7 +28,9 @@ class ReviewsController < ApplicationController
 
     issue_types = permitted_review.delete(:issue_types)
 
-    @review = Review.new(permitted_review)
+    @review = @artifact.reviews.build(
+      permitted_review
+    )
 
     begin
       Review.transaction do
@@ -33,7 +41,7 @@ class ReviewsController < ApplicationController
         )
       end
 
-      redirect_to review_path(@review)
+      redirect_to artifact_review_path(@review)
 
     rescue ActiveRecord::RecordInvalid => e
       @review.errors.add(

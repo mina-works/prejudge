@@ -1,6 +1,11 @@
 <h1>成果物　詳細</h1>
 
 <p>
+  ID:
+  <%= @artifact.id %>
+</p>
+
+<p>
   タイトル:
   <%= @artifact.title %>
 </p>
@@ -29,5 +34,10 @@
   作成日:
   <%= @artifact.created_at %>
 </p>
+
+<%= link_to "レビューする",
+  new_artifact_review_path(
+    @artifact
+  ) %>
 
 <%= link_to "一覧へ戻る", artifacts_path %>
