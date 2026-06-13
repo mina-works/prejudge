@@ -3,7 +3,10 @@
 <% @reviews.each do |review| %>
   <div>
     <%= link_to review.id,
-      review_path(review) %>
+      artifact_review_path(
+        review.artifact,
+        review
+      ) %>
 
     <%= review.result_label %>
   </div>

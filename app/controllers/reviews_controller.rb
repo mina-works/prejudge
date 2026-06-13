@@ -4,7 +4,13 @@ class ReviewsController < ApplicationController
   end
 
   def show
-    @review = Review.find(params[:id])
+    @artifact = Artifact.find(
+      params[:artifact_id]
+    )
+
+    @review = @artifact.reviews.find(
+      params[:id]
+    )
   end
   
   def new
@@ -41,7 +47,10 @@ class ReviewsController < ApplicationController
         )
       end
 
-      redirect_to artifact_review_path(@review)
+      redirect_to artifact_review_path(
+        @artifact,
+        @review
+      )
 
     rescue ActiveRecord::RecordInvalid => e
       @review.errors.add(
