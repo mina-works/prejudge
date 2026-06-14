@@ -1,4 +1,8 @@
 class ReviewsController < ApplicationController
+
+  before_action :set_artifact,
+                only: [:new, :create]
+
   def index
     @reviews = Review.all
   end
@@ -14,17 +18,10 @@ class ReviewsController < ApplicationController
   end
   
   def new
-    @artifact = Artifact.find(
-      params[:artifact_id]
-    )
-    
     @review = @artifact.reviews.build
   end
 
   def create
-    @artifact = Artifact.find(
-      params[:artifact_id]
-    )
     permitted_review = params.require(:review).permit(
       :user_id,
       :result,
@@ -60,6 +57,15 @@ class ReviewsController < ApplicationController
       
       render :new, status: :unprocessable_entity
     end
+  end
+
+
+  private
+
+  def set_artifact
+    @artifact = Artifact.find(
+      params[:artifact_id]
+    )
   end
 
 end
