@@ -1,17 +1,13 @@
 class ReviewsController < ApplicationController
 
   before_action :set_artifact,
-                only: [:new, :create]
+                only: [:index, :show, :new, :create]
 
   def index
     @reviews = Review.all
   end
 
   def show
-    @artifact = Artifact.find(
-      params[:artifact_id]
-    )
-
     @review = @artifact.reviews.find(
       params[:id]
     )

@@ -35,6 +35,32 @@
   <%= @artifact.created_at %>
 </p>
 
+<h2><%= link_to "レビュー履歴", artifact_reviews_path(@artifact) %></h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>レビュー回</th>
+      <th>レビュー数</th>
+      <th>OK</th>
+      <th>違和感あり</th>
+      <th>NG</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @reviews_by_round.each do |round, reviews| %>
+      <tr>
+        <td>第<%= round %>回</td>
+        <td><%= reviews.count %></td>
+        <td><%= reviews.count(&:ok?) %></td>
+        <td><%= reviews.count(&:uneasy?) %></td>
+        <td><%= reviews.count(&:ng?) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
 <%= link_to "レビューする",
   new_artifact_review_path(
     @artifact

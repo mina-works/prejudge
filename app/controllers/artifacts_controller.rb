@@ -5,6 +5,9 @@ class ArtifactsController < ApplicationController
 
   def show
     @artifact = Artifact.find(params[:id])
+
+    @reviews_by_round =
+      @artifact.reviews.group_by(&:round)
   end
 
   def create
