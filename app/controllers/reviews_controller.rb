@@ -44,10 +44,7 @@ class ReviewsController < ApplicationController
         )
       end
 
-      redirect_to artifact_review_path(
-        @artifact,
-        @review
-      )
+      redirect_to [@artifact, @review]
 
     rescue ActiveRecord::RecordInvalid => e
       @review.errors.add(
