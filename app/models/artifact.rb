@@ -14,6 +14,10 @@ class Artifact < ApplicationRecord
     reviewed: 3
   }
 
+  validates :title,presence: true
+  validates :review_deadline,presence: true
+  validate :review_deadline_cannot_be_past
+
   # 選択肢生成用：status(enum)を日本語ラベルに変換する
   def self.status_label(status)
     I18n.t(
@@ -24,5 +28,18 @@ class Artifact < ApplicationRecord
   # 表示用：status(enum)を日本語ラベルに変換する
   def status_label
     self.class.status_label(status)
+  end
+
+  private
+
+  def review_deadline_cannot_be_past
+    return if review_deadline.blank?
+
+    if review_deadline < Time.current
+      errors.add(
+        :review_deadline,
+        "は現在より後の日時を指定してください"
+      )
+    end
   end
 end
