@@ -38,7 +38,7 @@ class Artifact < ApplicationRecord
     if review_deadline < Time.current
       errors.add(
         :review_deadline,
-        "は現在より後の日時を指定してください"
+        I18n.t("errors.artifact.review_deadline_cannot_be_past")
       )
     end
   end

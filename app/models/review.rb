@@ -62,7 +62,7 @@ class Review < ApplicationRecord
 
   def prevent_edit_past_review
     if round < artifact.current_round
-      errors.add(:base, "過去ラウンドのレビューは編集できません")
+      errors.add(:base, I18n.t("errors.review.prevent_edit_past_review"))
     end
   end
 
@@ -79,7 +79,7 @@ class Review < ApplicationRecord
     return unless ng?
     return if approver?
 
-    errors.add(:result, "レビュアーはNGを選択できません")
+    errors.add(:result,  I18n.t("errors.review.reviewer_cannot_select_ng"))
   end
 
   def update_artifact_status

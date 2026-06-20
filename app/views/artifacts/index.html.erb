@@ -1,4 +1,4 @@
-<h1>成果物　一覧</h1>
+<h1><%= t(".title") %></h1>
 
 <% @artifacts.each do |artifact| %>
   <div>
@@ -6,11 +6,12 @@
       artifact_path(artifact) %>
 
     <p>
-      ステータス:
+      <%= Artifact.human_attribute_name(:status) %>:
       <%= artifact.status_label %>
     </p>
 
-    <p>round:
+    <p>
+      <%= Review.human_attribute_name(:round) %>:
       <%= artifact.current_round %>
     </p>
   </div>

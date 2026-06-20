@@ -1,4 +1,4 @@
-<h1>成果物　詳細</h1>
+<h1><%= t(".title") %></h1>
 
 <p>
   ID:
@@ -6,45 +6,45 @@
 </p>
 
 <p>
-  タイトル:
+  <%= Artifact.human_attribute_name(:title) %> :
   <%= @artifact.title %>
 </p>
 
 <p>
-  制作者:
+  <%= Artifact.human_attribute_name(:creator) %>:
   <%= @artifact.creator.name %>
 </p>
 
 <p>
-  説明:
+  <%= Artifact.human_attribute_name(:description) %>:
   <%= @artifact.description %>
 </p>
 
 <p>
-  ステータス:
+  <%= Artifact.human_attribute_name(:status) %>:
   <%= @artifact.status_label %>
 </p>
 
 <p>
-  round:
+  <%= Review.human_attribute_name(:round) %>:
   <%= @artifact.current_round %>
 </p>
 
 <p>
-  作成日:
+  <%= Artifact.human_attribute_name(:created_at) %>:
   <%= @artifact.created_at %>
 </p>
 
-<h2><%= link_to "レビュー履歴", artifact_reviews_path(@artifact) %></h2>
+<h2><%= link_to t("reviews.index.title"), artifact_reviews_path(@artifact) %></h2>
 
 <table>
   <thead>
     <tr>
-      <th>レビュー回</th>
-      <th>レビュー数</th>
-      <th>OK</th>
-      <th>違和感あり</th>
-      <th>NG</th>
+      <th><%= Review.human_attribute_name(:round) %></th>
+      <th><%= t(".review_count") %></th>
+      <th><%= Review.result_label(:ok) %></th>
+      <th><%= Review.result_label(:uneasy) %></th>
+      <th><%= Review.result_label(:ng) %></th>
     </tr>
   </thead>
 
@@ -61,9 +61,9 @@
   </tbody>
 </table>
 
-<%= link_to "レビューする",
+<%= link_to t("common.create"),
   new_artifact_review_path(
     @artifact
   ) %>
 
-<%= link_to "一覧へ戻る", artifacts_path %>
+<%= link_to t("common.back_to_list"), artifacts_path %>

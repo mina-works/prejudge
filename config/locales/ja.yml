@@ -1,4 +1,67 @@
 ja:
+  activerecord:
+    attributes:
+      artifact:
+        title: タイトル
+        description: 説明
+        status: ステータス
+        review_deadline: レビュー期限
+        creator: 制作者
+        created_at: 作成日
+
+      review:
+        result: 判定結果
+        round: レビュー回
+        comment: コメント
+        user: レビューした人
+
+      reviewIssue:
+      user:
+
+  common:
+    create: 作成
+    update: 更新
+    delete: 削除
+    back: 戻る
+    back_to_list: 一覧へ戻る
+    submit: 送信
+
+  artifacts:
+    index:
+      title: 成果物一覧
+    
+    show:
+      title: 成果物詳細
+      review_count: レビュー数
+    
+    new:
+      title: 成果物登録
+
+  reviews:
+    index:
+      title: レビュー一覧
+
+    show:
+      title: レビュー詳細
+    
+    new:
+      title: レビュー作成
+      review_issue_reason: 違和感の理由
+
+  errors:
+    messages:
+      blank: を入力してください
+
+    artifact:
+      review_deadline_cannot_be_past: は現在より後の日時を指定してください
+
+    review:
+      prevent_edit_past_review: 過去ラウンドのレビューは編集できません
+      reviewer_cannot_select_ng: レビュアーはNGを選択できません
+
+    review_issue:
+      review_is_ok: OKを選択したレビューには違和感を登録できません
+
   enums:
     artifact:
       status:
@@ -6,15 +69,17 @@ ja:
         reviewing: レビュー中
         revision_required: 修正が必要
         reviewed: レビュー済み
+
     review:
       result:
-        ok: "OK"
-        uneasy: "違和感あり"
-        ng: "NG"
+        ok: OK
+        uneasy: 違和感あり
+        ng: NG
+
     review_issue:
       issue_type:
-        wrong_atmosphere: "雰囲気が想定と違う"
-        wrong_target: "対象者に合っていない"
-        tone_mismatch: "トーンが合っていない"
-        too_much_or_little_info: "情報量の過不足"
-        direction_issue: "方向性に問題がある"
+        wrong_atmosphere: 雰囲気が想定と違う
+        wrong_target: 対象者に合っていない
+        tone_mismatch: トーンが合っていない
+        too_much_or_little_info: 情報量の過不足
+        direction_issue: 方向性に問題がある

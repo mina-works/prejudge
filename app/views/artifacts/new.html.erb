@@ -1,4 +1,4 @@
-<h1>成果物登録</h1>
+<h1><%= t(".title") %></h1>
 
 <%# エラーメッセージ %>
 <%= render "shared/error_messages",
@@ -25,7 +25,7 @@
   </div>
 
   <div>
-    <%= form.submit "送信" %>
+    <%= form.submit t("common.submit") %>
   </div>
 
 <% end %>

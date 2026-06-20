@@ -1,4 +1,4 @@
-<h1>New Review</h1>
+<h1><%= t(".title") %></h1>
 
 <%# エラーメッセージ %>
 <%= render "shared/error_messages",
@@ -19,7 +19,7 @@
   </div>
 
   <div>
-    <p>違和感の理由</p>
+    <p><%= t(".review_issue_reason") %></p>
 
     <% ReviewIssue.issue_types.keys.each do |issue_type| %>
       <%= check_box_tag(
@@ -45,10 +45,10 @@
   </div>
 
   <div>
-    <%= form.submit "送信" %>
+    <%= form.submit t("common.submit") %>
   </div>
 
 <% end %>
 
-<%= link_to "詳細へ戻る",
+<%= link_to t("common.back"),
   artifact_path(@artifact) %>
