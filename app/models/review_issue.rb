@@ -24,6 +24,6 @@ class ReviewIssue < ApplicationRecord
   def review_must_not_be_ok
     return unless review&.ok?
 
-    errors.add(:base, "OKを選択したレビューには違和感を登録できません")
+    errors.add(:base, I18n.t("errors.review_issue.review_is_ok"))
   end
 end
