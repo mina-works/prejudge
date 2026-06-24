@@ -40,6 +40,7 @@ class ReviewsController < ApplicationController
         )
       end
 
+      flash[:notice] = t("flash.review.created")
       redirect_to [@artifact, @review]
 
     rescue ActiveRecord::RecordInvalid => e

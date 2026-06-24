@@ -33,6 +33,7 @@ ja:
     show:
       title: 成果物詳細
       review_count: レビュー数
+      resubmit: 再提出
     
     new:
       title: 成果物登録
@@ -83,3 +84,11 @@ ja:
         tone_mismatch: トーンが合っていない
         too_much_or_little_info: 情報量の過不足
         direction_issue: 方向性に問題がある
+
+  flash:
+    review:
+      created: レビューを作成しました
+
+    artifact:
+      created: 成果物を作成しました
+      resubmitted: 成果物を再提出しました

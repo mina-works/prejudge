@@ -30,7 +30,7 @@ class ArtifactsController < ApplicationController
     @artifact.resubmit!
 
     redirect_to @artifact,
-      notice: "再提出しました"
+      notice: t("flash.artifact.resubmitted")
 
   rescue ActiveRecord::RecordInvalid => e
     redirect_to @artifact,
