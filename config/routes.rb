@@ -9,6 +9,10 @@ Rails.application.routes.draw do
   # root "posts#index"
   
   resources :artifacts do
+    member do
+      patch :resubmit
+    end
+    
     resources :reviews, only: [:index, :new, :create, :show]
   end
 end

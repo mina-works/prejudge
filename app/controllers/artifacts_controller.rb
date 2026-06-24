@@ -1,11 +1,13 @@
 class ArtifactsController < ApplicationController
+
+  before_action :set_artifact,
+                only: [:show, :resubmit]
+
   def index
     @artifacts = Artifact.all
   end
 
   def show
-    @artifact = Artifact.find(params[:id])
-
     @reviews_by_round =
       @artifact.reviews.group_by(&:round)
   end
@@ -24,7 +26,22 @@ class ArtifactsController < ApplicationController
     end
   end
 
+  def resubmit
+    @artifact.resubmit!
+
+    redirect_to @artifact,
+      notice: "再提出しました"
+
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @artifact,
+      alert: e.record.errors.full_messages.join(", ")
+  end
+
   private
+
+  def set_artifact
+    @artifact = Artifact.find(params[:id])
+  end
 
   def artifact_params
     params.require(:artifact).permit(

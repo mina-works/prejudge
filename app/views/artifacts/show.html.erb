@@ -35,6 +35,11 @@
   <%= @artifact.created_at %>
 </p>
 
+<p>
+  <%= Artifact.human_attribute_name(:review_deadline) %>:
+  <%= @artifact.review_deadline %>
+</p>
+
 <h2><%= link_to t("reviews.index.title"), artifact_reviews_path(@artifact) %></h2>
 
 <table>
@@ -60,6 +65,12 @@
     <% end %>
   </tbody>
 </table>
+
+<%= button_to(
+  "再提出",
+  resubmit_artifact_path(@artifact),
+  method: :patch
+) %>
 
 <%= link_to t("common.create"),
   new_artifact_review_path(

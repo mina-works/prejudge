@@ -30,6 +30,14 @@ class Artifact < ApplicationRecord
     self.class.status_label(status)
   end
 
+  # 再提出時、status変更しround加算する
+  def resubmit!
+    self.current_round += 1
+    self.status = :reviewing
+
+    save!
+  end
+
   private
 
   def review_deadline_cannot_be_past
