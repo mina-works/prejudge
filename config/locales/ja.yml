@@ -25,6 +25,7 @@ ja:
     back: 戻る
     back_to_list: 一覧へ戻る
     submit: 送信
+    edit: 編集
 
   artifacts:
     index:
@@ -37,6 +38,9 @@ ja:
     
     new:
       title: 成果物登録
+
+    edit:
+      title: 成果物　編集
 
   reviews:
     index:
@@ -92,3 +96,5 @@ ja:
     artifact:
       created: 成果物を作成しました
       resubmitted: 成果物を再提出しました
+      updated: 更新しました
+      not_editable: この成果物は現在編集できません

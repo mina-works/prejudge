@@ -66,15 +66,26 @@
   </tbody>
 </table>
 
-<%= button_to(
-  t(".resubmit"),
-  resubmit_artifact_path(@artifact),
-  method: :patch
-) %>
+<%# 再提出 %>
+<% if @artifact.revision_required? %>
+  <%= button_to(
+    t(".resubmit"),
+    resubmit_artifact_path(@artifact),
+    method: :patch
+  ) %>
+<% end %>
 
+<%# 作成 %>
 <%= link_to t("common.create"),
   new_artifact_review_path(
     @artifact
   ) %>
 
+<%# 編集 %>
+<% if @artifact.editable? %>
+  <%= link_to t("common.edit"),
+    edit_artifact_path(@artifact) %>
+<% end %>
+
+<%# 一覧へ戻る %>
 <%= link_to t("common.back_to_list"), artifacts_path %>

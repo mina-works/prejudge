@@ -1,0 +1,31 @@
+<h1><%= t(".title") %></h1>
+
+<%# エラーメッセージ %>
+<%= render "shared/error_messages",
+  resource: @artifact %>
+
+
+<%= form_with model: @artifact do |form| %>
+
+  <%= form.hidden_field :creator_id, value: User.last.id %>
+
+  <div>
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div>
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.label :review_deadline %>
+    <%= form.date_field :review_deadline %>
+  </div>
+
+  <div>
+    <%= form.submit t("common.submit") %>
+  </div>
+
+<% end %>
