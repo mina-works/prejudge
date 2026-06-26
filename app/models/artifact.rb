@@ -38,6 +38,11 @@ class Artifact < ApplicationRecord
     save!
   end
 
+  # 成果物が編集可能なステータスか判定する
+  def editable?
+    draft? || revision_required?
+  end
+
   private
 
   def review_deadline_cannot_be_past

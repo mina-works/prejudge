@@ -1,7 +1,10 @@
 class ArtifactsController < ApplicationController
 
   before_action :set_artifact,
-                only: [:show, :resubmit]
+                only: [:show, :edit, :update, :resubmit]
+  
+  before_action :ensure_editable,
+  only: [:edit, :update]
 
   def index
     @artifacts = Artifact.all
@@ -23,6 +26,19 @@ class ArtifactsController < ApplicationController
       redirect_to @artifact
     else
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+  end
+
+  def update
+    if @artifact.update(artifact_params)
+      redirect_to @artifact,
+        notice: t("flash.artifact.updated")
+    else
+      render :edit,
+        status: :unprocessable_entity
     end
   end
 
@@ -50,5 +66,12 @@ class ArtifactsController < ApplicationController
       :creator_id,
       :review_deadline
     )
+  end
+
+  def ensure_editable
+    return if @artifact.editable?
+
+    redirect_to @artifact,
+      alert: t("flash.artifact.not_editable")
   end
 end
