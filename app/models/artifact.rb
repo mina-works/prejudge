@@ -43,6 +43,11 @@ class Artifact < ApplicationRecord
     draft? || revision_required?
   end
 
+  # 再提出可能なステータスか判定する
+  def resubmittable?
+    revision_required?
+  end
+
   private
 
   def review_deadline_cannot_be_past

@@ -6,6 +6,9 @@ class ArtifactsController < ApplicationController
   before_action :ensure_editable,
   only: [:edit, :update]
 
+  before_action :ensure_resubmittable,
+  only: [:resubmit]
+
   def index
     @artifacts = Artifact.all
   end
@@ -73,5 +76,12 @@ class ArtifactsController < ApplicationController
 
     redirect_to @artifact,
       alert: t("flash.artifact.not_editable")
+  end
+
+  def ensure_resubmittable
+    return if @artifact.resubmittable?
+
+    redirect_to @artifact,
+      alert: t("flash.artifact.not_resubmittable")
   end
 end
