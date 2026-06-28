@@ -4,7 +4,7 @@ class ReviewsController < ApplicationController
                 only: [:index, :show, :new, :create]
 
   def index
-    @reviews = Review.all
+    @reviews = @artifact.reviews
   end
 
   def show
