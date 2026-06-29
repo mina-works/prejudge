@@ -71,6 +71,7 @@ ja:
     artifact:
       status:
         draft: 下書き
+        pending_review: レビュー待ち
         reviewing: レビュー中
         revision_required: 修正が必要
         reviewed: レビュー済み

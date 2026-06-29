@@ -9,9 +9,10 @@ class Artifact < ApplicationRecord
   
   enum status: {
     draft: 0,
-    reviewing: 1,
-    revision_required: 2,
-    reviewed: 3
+    pending_review: 1,
+    reviewing: 2,
+    revision_required: 3,
+    reviewed: 4
   }
 
   validates :title,presence: true
