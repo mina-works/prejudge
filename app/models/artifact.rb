@@ -31,10 +31,17 @@ class Artifact < ApplicationRecord
     self.class.status_label(status)
   end
 
-  # 再提出時、status変更しround加算する
+   # 成果物をレビュー依頼する
+  def submit!
+    raise "提出できません" unless submittable?
+
+    pending_review!
+  end
+
+  # 成果物を再提出する
   def resubmit!
     self.current_round += 1
-    self.status = :reviewing
+    self.status = :pending_review
 
     save!
   end
@@ -47,6 +54,11 @@ class Artifact < ApplicationRecord
   # 再提出可能なステータスか判定する
   def resubmittable?
     revision_required?
+  end
+
+  # レビュー依頼可能か判定する
+  def submittable?
+    draft?
   end
 
   private

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   
   resources :artifacts do
     member do
+      patch :submit
       patch :resubmit
     end
     

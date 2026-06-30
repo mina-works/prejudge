@@ -66,6 +66,15 @@
   </tbody>
 </table>
 
+<%# 提出 %>
+<% if @artifact.draft? %>
+  <%= button_to(
+    t(".submit"),
+    submit_artifact_path(@artifact),
+    method: :patch
+  ) %>
+<% end %>
+
 <%# 再提出 %>
 <% if @artifact.revision_required? %>
   <%= button_to(
