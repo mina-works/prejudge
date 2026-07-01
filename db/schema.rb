@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_27_080351) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_29_132357) do
   create_table "artifact_reviewers", force: :cascade do |t|
     t.integer "artifact_id", null: false
     t.integer "user_id", null: false

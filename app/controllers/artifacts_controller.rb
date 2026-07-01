@@ -1,13 +1,16 @@
 class ArtifactsController < ApplicationController
 
   before_action :set_artifact,
-                only: [:show, :edit, :update, :resubmit]
+                only: [:show, :edit, :update, :submit, :resubmit]
   
   before_action :ensure_editable,
   only: [:edit, :update]
 
   before_action :ensure_resubmittable,
   only: [:resubmit]
+
+  before_action :ensure_submittable,
+  only: [:submit]
 
   def index
     @artifacts = Artifact.all
@@ -43,6 +46,13 @@ class ArtifactsController < ApplicationController
       render :edit,
         status: :unprocessable_entity
     end
+  end
+
+  def submit
+    @artifact.submit!
+
+    redirect_to @artifact,
+      notice: t("flash.artifact.submitted")
   end
 
   def resubmit
@@ -83,5 +93,12 @@ class ArtifactsController < ApplicationController
 
     redirect_to @artifact,
       alert: t("flash.artifact.not_resubmittable")
+  end
+
+  def ensure_submittable
+    return if @artifact.submittable?
+
+    redirect_to @artifact,
+      alert: t("flash.artifact.not_submittable")
   end
 end
