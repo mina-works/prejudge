@@ -31,9 +31,16 @@ class Artifact < ApplicationRecord
     self.class.status_label(status)
   end
 
-   # 成果物をレビュー依頼する
+  # 成果物をレビュー依頼する
   def submit!
-    raise "提出できません" unless submittable?
+    unless submittable?
+      errors.add(
+        :base,
+        I18n.t("errors.artifact.not_submittable")
+      )
+
+      raise ActiveRecord::RecordInvalid.new(self)
+    end
 
     pending_review!
   end

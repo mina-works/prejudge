@@ -60,6 +60,7 @@ ja:
 
     artifact:
       review_deadline_cannot_be_past: は現在より後の日時を指定してください
+      not_submittable: 提出できません
 
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません
