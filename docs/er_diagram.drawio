@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36">
   <diagram id="R2lEEEUBdFMjLlhIrx00" name="Page-1">
-    <mxGraphModel dx="1414" dy="845" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
+    <mxGraphModel dx="907" dy="687" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0" extFonts="Permanent Marker^https://fonts.googleapis.com/css?family=Permanent+Marker">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -82,7 +82,7 @@
             <mxRectangle height="50" width="90" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="7nVnka5838OOuUNOD480-21" parent="7nVnka5838OOuUNOD480-19" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" value="status&lt;br&gt;（draft / reviewing / revision_required&amp;nbsp;/ reviewed）" vertex="1">
+        <mxCell id="7nVnka5838OOuUNOD480-21" parent="7nVnka5838OOuUNOD480-19" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" value="status&lt;br&gt;（draft / pending_review / reviewing / revision_required&amp;nbsp;/ reviewed）" vertex="1">
           <mxGeometry height="50" width="250" x="90" as="geometry">
             <mxRectangle height="50" width="250" as="alternateBounds" />
           </mxGeometry>
@@ -394,9 +394,6 @@
             <mxPoint x="260" y="420" as="sourcePoint" />
             <mxPoint x="680" y="390" as="targetPoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="ZkbpIHNRqkHhpV0PwGgc-2" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;README&lt;/h1&gt;&lt;p&gt;成果物ファイルは Active Storage を利用して管理しています。&lt;/p&gt;&lt;p&gt;ER図では業務ドメインに集中するため、&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Active Storage の内部テーブルは省略しています。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;本システムでは、レビュアーの役割を approver と reviewer に分けています。&lt;/span&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;approver は1人のみ設定され、最終的な状態遷移の決定権を持ちます。&lt;/span&gt;&lt;span style=&quot;color: light-dark(rgba(0, 0, 0, 0), rgba(237, 237, 237, 0)); background-color: transparent;&quot;&gt;eviewerの多対多化は中間テーブルで拡張可能です。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;reviewer は補助的なレビューを行い、成果物に対して違和感（uneasy）を表明できますが、&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;差し戻し（ng）は行えません。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;成果物の状態は approver のレビュー結果によってのみ遷移します。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;また、レビューは履歴として管理され、&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;再提出ごとにラウンド（round）がインクリメントされます。&lt;/span&gt;&lt;/p&gt;" vertex="1">
-          <mxGeometry height="285" width="440" x="40" y="495" as="geometry" />
         </mxCell>
         <mxCell id="aYGBQCYptMTv6T0Rmmf4-8" parent="1" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="artifact_reviewers" vertex="1">
           <mxGeometry height="160" width="180" x="680" y="310" as="geometry" />
