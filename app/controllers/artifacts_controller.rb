@@ -53,6 +53,10 @@ class ArtifactsController < ApplicationController
 
     redirect_to @artifact,
       notice: t("flash.artifact.submitted")
+
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @artifact,
+      alert: e.record.errors.full_messages.join(", ")
   end
 
   def resubmit
