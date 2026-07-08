@@ -21,6 +21,16 @@
 </p>
 
 <p>
+  <%= t("common.approver")%>:
+  <%= @artifact.approver&.name %>
+</p>
+
+<p>
+  <%= t("common.reviewer")%>:
+  <%= @artifact.reviewers.map(&:name).join(", ") %>
+</p>
+
+<p>
   <%= Artifact.human_attribute_name(:status) %>:
   <%= @artifact.status_label %>
 </p>
@@ -40,7 +50,7 @@
   <%= @artifact.review_deadline %>
 </p>
 
-<h2><%= link_to t("reviews.index.title"), artifact_reviews_path(@artifact) %></h2>
+<h3><%= link_to t("reviews.index.title"), artifact_reviews_path(@artifact) %></h3>
 
 <table>
   <thead>

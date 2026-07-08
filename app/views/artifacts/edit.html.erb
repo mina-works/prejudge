@@ -24,6 +24,40 @@
     <%= form.date_field :review_deadline %>
   </div>
 
+  <%# Approver選択 %>
+  <h3><%= t("common.approver")%></h3>
+
+  <% @users.each do |user| %>
+    <div>
+      <%= radio_button_tag(
+        "artifact[approver_id]",
+        user.id,
+        @artifact.artifact_reviewers
+                .approver
+                .exists?(user: user)
+      ) %>
+
+      <%= user.name %>
+    </div>
+  <% end %>
+
+  <%# Reviewer選択 %>
+  <h3><%= t("common.reviewer")%></h3>
+
+  <% @users.each do |user| %>
+    <div>
+      <%= check_box_tag(
+        "artifact[reviewer_ids][]",
+        user.id,
+        @artifact.artifact_reviewers
+                .reviewer
+                .exists?(user: user)
+      ) %>
+
+      <%= user.name %>
+    </div>
+  <% end %>
+
   <div>
     <%= form.submit t("common.submit") %>
   </div>

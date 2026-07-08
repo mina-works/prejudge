@@ -68,6 +68,33 @@ class Artifact < ApplicationRecord
     draft?
   end
 
+  # Reviewer・Approverを割り当てる
+  def assign_review_members(reviewer_ids, approver_id)
+    artifact_reviewers.destroy_all
+
+    reviewer_ids.reject(&:blank?).each do |user_id|
+      artifact_reviewers.create!(
+        user_id: user_id,
+        role: :reviewer
+      )
+    end
+
+    artifact_reviewers.create!(
+      user_id: approver_id,
+      role: :approver
+    )
+  end
+
+  # approverを表示
+  def approver
+    artifact_reviewers.approver.first&.user
+  end
+
+  # reviewerを表示
+  def reviewers
+    artifact_reviewers.reviewer.includes(:user).map(&:user)
+  end
+
   private
 
   def review_deadline_cannot_be_past
