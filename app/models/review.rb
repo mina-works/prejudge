@@ -18,7 +18,8 @@ class Review < ApplicationRecord
   before_validation :set_round
 
 
-  # Artifactへ状態確認を依頼する
+  # approverのreview結果に応じてartifact.statusを更新する
+  # reviewerのreviewはstatusに影響しない
   after_create :update_artifact_status
 
 
@@ -30,10 +31,6 @@ class Review < ApplicationRecord
   # 最終的な差し戻し権限はapproverのみが持つ
   validate :reviewer_cannot_select_ng
 
-
-  # approverのreview結果に応じてartifact.statusを更新する
-  # reviewerのreviewはstatusに影響しない
-  after_create :update_artifact_status
 
 
   # 選択肢生成用：result(enum)を日本語ラベルに変換する
@@ -84,18 +81,6 @@ class Review < ApplicationRecord
     return if approver?
 
     errors.add(:result,  I18n.t("errors.review.reviewer_cannot_select_ng"))
-  end
-
-  def update_artifact_status
-    return unless approver?
-
-    if ok?
-      artifact.reviewed!
-    
-    # approverがuneasy/ngの場合は修正依頼状態にする
-    elsif uneasy? || ng?
-      artifact.revision_required!
-    end
   end
 
   def update_artifact_status
