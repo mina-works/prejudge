@@ -18,6 +18,10 @@ class Review < ApplicationRecord
   before_validation :set_round
 
 
+  # Artifactへ状態確認を依頼する
+  after_create :update_artifact_status
+
+
   # review履歴保護のため、過去roundのreview編集を禁止する
   validate :prevent_edit_past_review, on: :update
 
@@ -94,4 +98,7 @@ class Review < ApplicationRecord
     end
   end
 
+  def update_artifact_status
+    artifact.update_status_from_reviews!
+  end
 end

@@ -26,6 +26,8 @@ ja:
     back_to_list: 一覧へ戻る
     submit: 送信
     edit: 編集
+    approver: 承認者
+    reviewer:  レビュアー
 
   artifacts:
     index:

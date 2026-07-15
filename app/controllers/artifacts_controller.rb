@@ -23,29 +23,79 @@ class ArtifactsController < ApplicationController
 
   def new
     @artifact = Artifact.new
+    @users = User.all
   end
 
   def create
-    @artifact = Artifact.new(artifact_params)
+    artifact_attributes = artifact_params.except(
+      :reviewer_ids,
+      :approver_id
+    )
 
-    if @artifact.save
-      redirect_to @artifact
-    else
-      render :new, status: :unprocessable_entity
+    reviewer_ids = artifact_params[:reviewer_ids]
+    approver_id  = artifact_params[:approver_id]
+
+    @artifact = Artifact.new(artifact_attributes)
+
+    Artifact.transaction do
+      @artifact.save!
+
+      @artifact.assign_review_members(
+        reviewer_ids,
+        approver_id
+      )
     end
+
+    flash[:notice] = t("flash.artifact.created")
+    redirect_to @artifact
+
+  rescue ActiveRecord::RecordInvalid => e
+    @artifact.errors.add(
+      :base,
+      e.record.errors.full_messages.join(", ")
+    )
+
+    @users = User.all
+
+    render :new,
+          status: :unprocessable_entity
   end
 
   def edit
+    @users = User.all
   end
 
   def update
-    if @artifact.update(artifact_params)
-      redirect_to @artifact,
-        notice: t("flash.artifact.updated")
-    else
-      render :edit,
-        status: :unprocessable_entity
+    artifact_attributes = artifact_params.except(
+        :reviewer_ids,
+        :approver_id
+      )
+
+    reviewer_ids = artifact_params[:reviewer_ids]
+    approver_id  = artifact_params[:approver_id]
+
+    # ArtifactとReviewer・Approverを一緒に更新する
+    Artifact.transaction do
+      @artifact.update!(artifact_attributes)
+
+      @artifact.assign_review_members(
+        reviewer_ids,
+        approver_id
+      )
     end
+
+    flash[:notice] = t("flash.artifact.updated")
+    redirect_to @artifact
+
+  rescue ActiveRecord::RecordInvalid => e
+    @artifact.errors.add(
+      :base,
+      e.record.errors.full_messages.join(", ")
+    )
+
+    @users = User.all
+
+    render :edit, status: :unprocessable_entity
   end
 
   def submit
@@ -81,7 +131,9 @@ class ArtifactsController < ApplicationController
       :title,
       :description,
       :creator_id,
-      :review_deadline
+      :review_deadline,
+      :approver_id,
+      reviewer_ids: []
     )
   end
 

@@ -3,6 +3,7 @@ class Artifact < ApplicationRecord
 
   has_many :artifact_reviewers, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :review_members, through: :artifact_reviewers, source: :user
 
   has_one :review_condition, dependent: :destroy
 
@@ -66,6 +67,84 @@ class Artifact < ApplicationRecord
   # レビュー依頼可能か判定する
   def submittable?
     draft?
+  end
+
+  # Reviewer・Approverを割り当てる
+  def assign_review_members(reviewer_ids, approver_id)
+    artifact_reviewers.destroy_all
+
+    reviewer_ids.reject(&:blank?).each do |user_id|
+      artifact_reviewers.create!(
+        user_id: user_id,
+        role: :reviewer
+      )
+    end
+
+    artifact_reviewers.create!(
+      user_id: approver_id,
+      role: :approver
+    )
+  end
+
+  # approverを表示
+  def approver
+    artifact_reviewers.approver.first&.user
+  end
+
+  # reviewerを表示
+  def reviewers
+    artifact_reviewers.reviewer.includes(:user).map(&:user)
+  end
+
+  # 現在ラウンドのレビューを取得する
+  def current_round_reviews
+    reviews.where(round: current_round)
+  end
+
+  # Reviewer全員が現在ラウンドでレビュー済みか判定する
+  def reviewer_reviews_completed?
+    assigned_ids = reviewers.map(&:id)
+
+    reviewed_ids = current_round_reviews
+                    .where(user_id: assigned_ids)
+                    .distinct
+                    .pluck(:user_id)
+
+    (assigned_ids - reviewed_ids).empty?
+  end
+
+  # 現在ラウンドのApproverのレビューを取得する
+  def current_approver_review
+    approver_user_id =
+      artifact_reviewers.approver.pick(:user_id)
+
+    return if approver_user_id.nil?
+
+    current_round_reviews.find_by(
+      user_id: approver_user_id
+    )
+  end
+
+  # Approverが現在ラウンドでレビュー済みか判定する
+  def approver_review_completed?
+    current_approver_review.present?
+  end
+
+  # 現在ラウンドのレビューが完了したか判定する
+  def review_completed?
+    reviewer_reviews_completed? &&
+    approver_review_completed?
+  end
+
+  # 現在ラウンドのレビュー結果からステータスを更新する
+  def update_status_from_reviews!
+    return unless review_completed?
+
+    if current_approver_review.ok?
+      reviewed!
+    else
+      revision_required!
+    end
   end
 
   private
