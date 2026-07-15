@@ -140,10 +140,10 @@ class Artifact < ApplicationRecord
   def update_status_from_reviews!
     return unless review_completed?
 
-    if current_approver_review.ng?
-      revision_required!
-    else
+    if current_approver_review.ok?
       reviewed!
+    else
+      revision_required!
     end
   end
 
