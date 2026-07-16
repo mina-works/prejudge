@@ -27,6 +27,10 @@ class Review < ApplicationRecord
   validate :prevent_edit_past_review, on: :update
 
 
+  # ReviewerまたはApproverでなければレビューできない
+  validate :user_must_be_review_member
+
+
   # reviewerはng（差し戻し）不可
   # 最終的な差し戻し権限はapproverのみが持つ
   validate :reviewer_cannot_select_ng
@@ -85,5 +89,17 @@ class Review < ApplicationRecord
 
   def update_artifact_status
     artifact.update_status_from_reviews!
+  end
+
+  def user_must_be_review_member
+    return if artifact.blank? || user.blank?
+
+    assigned = artifact.artifact_reviewers.exists?(user_id: user_id)
+    return if assigned
+
+    errors.add(
+      :user,
+      I18n.t("errors.review.user_must_be_review_member")
+    )
   end
 end
