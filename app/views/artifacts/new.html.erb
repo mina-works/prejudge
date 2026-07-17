@@ -7,7 +7,7 @@
 
 <%= form_with model: @artifact do |form| %>
 
-  <%= form.hidden_field :creator_id, value: User.last.id %>
+  <%= form.hidden_field :creator_id, value: User.first.id %>
 
   <div>
     <%= form.label :title %>

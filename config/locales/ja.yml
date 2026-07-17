@@ -67,6 +67,8 @@ ja:
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません
       reviewer_cannot_select_ng: レビュアーはNGを選択できません
+      user_must_be_review_member: はこの成果物のレビュー担当者ではありません
+      artifact_must_be_reviewable: 現在のステータスではレビューをすることができません
 
     review_issue:
       review_is_ok: OKを選択したレビューには違和感を登録できません

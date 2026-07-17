@@ -46,6 +46,11 @@ class Artifact < ApplicationRecord
     pending_review!
   end
 
+  # レビュー依頼可能か判定する
+  def submittable?
+    draft?
+  end
+
   # 成果物を再提出する
   def resubmit!
     self.current_round += 1
@@ -62,11 +67,6 @@ class Artifact < ApplicationRecord
   # 再提出可能なステータスか判定する
   def resubmittable?
     revision_required?
-  end
-
-  # レビュー依頼可能か判定する
-  def submittable?
-    draft?
   end
 
   # Reviewer・Approverを割り当てる
@@ -134,6 +134,17 @@ class Artifact < ApplicationRecord
   def review_completed?
     reviewer_reviews_completed? &&
     approver_review_completed?
+  end
+
+  # レビュー作成後の状態遷移をまとめて行う
+  def update_status_after_review!
+    start_reviewing!
+    update_status_from_reviews!
+  end
+
+  # 最初のレビューが作成されたらレビュー中にする
+  def start_reviewing!
+    reviewing! if pending_review?
   end
 
   # 現在ラウンドのレビュー結果からステータスを更新する
