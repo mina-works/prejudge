@@ -7,6 +7,8 @@ class Artifact < ApplicationRecord
 
   has_one :review_condition, dependent: :destroy
 
+  attr_writer :reviewer_ids, :approver_id
+
   
   enum status: {
     draft: 0,
@@ -18,7 +20,33 @@ class Artifact < ApplicationRecord
 
   validates :title,presence: true
   validates :review_deadline,presence: true
+
   validate :review_deadline_cannot_be_past
+
+
+  # フォームから渡されたReviewer IDを返す。
+  # edit画面を最初に表示したときは、DBに保存済みの値を返す。
+  def reviewer_ids
+    return @reviewer_ids if defined?(@reviewer_ids)
+
+    artifact_reviewers.reviewer.pluck(:user_id)
+  end
+
+  # フォームから渡されたApprover IDを返す。
+  # edit画面を最初に表示したときは、DBに保存済みの値を返す。
+  def approver_id
+    return @approver_id if defined?(@approver_id)
+
+    artifact_reviewers.approver.pick(:user_id)
+  end
+
+  # Artifact本体とレビュー担当者をまとめて保存する
+  def save_with_review_members!
+    self.class.transaction do
+      save!
+      replace_review_members!
+    end
+  end
 
   # 選択肢生成用：status(enum)を日本語ラベルに変換する
   def self.status_label(status)
@@ -159,6 +187,29 @@ class Artifact < ApplicationRecord
   end
 
   private
+
+  def replace_review_members!
+    artifact_reviewers.destroy_all
+
+    normalized_reviewer_ids.each do |user_id|
+      artifact_reviewers.create!(
+        user_id: user_id,
+        role: :reviewer
+      )
+    end
+
+    artifact_reviewers.create!(
+      user_id: approver_id,
+      role: :approver
+    )
+  end
+
+  def normalized_reviewer_ids
+    Array(reviewer_ids)
+      .reject(&:blank?)
+      .map(&:to_s)
+      .uniq
+  end
 
   def review_deadline_cannot_be_past
     return if review_deadline.blank?

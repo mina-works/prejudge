@@ -27,24 +27,8 @@ class ArtifactsController < ApplicationController
   end
 
   def create
-    artifact_attributes = artifact_params.except(
-      :reviewer_ids,
-      :approver_id
-    )
-
-    reviewer_ids = artifact_params[:reviewer_ids]
-    approver_id  = artifact_params[:approver_id]
-
-    @artifact = Artifact.new(artifact_attributes)
-
-    Artifact.transaction do
-      @artifact.save!
-
-      @artifact.assign_review_members(
-        reviewer_ids,
-        approver_id
-      )
-    end
+    @artifact = Artifact.new(artifact_params)
+    @artifact.save_with_review_members!
 
     flash[:notice] = t("flash.artifact.created")
     redirect_to @artifact
