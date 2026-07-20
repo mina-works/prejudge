@@ -23,6 +23,7 @@ class Artifact < ApplicationRecord
 
   validate :review_deadline_cannot_be_past
   validate :approver_must_be_selected
+  validate :reviewer_and_approver_must_be_different
 
 
   # フォームから渡されたReviewer IDを返す。
@@ -214,6 +215,17 @@ class Artifact < ApplicationRecord
     errors.add(
       :approver_id,
       I18n.t("errors.artifact.approver_required")
+    )
+  end
+
+  # ReviewerとApproverには、同じユーザーを選択できない
+  def reviewer_and_approver_must_be_different
+    return if approver_id.blank?
+    return unless normalized_reviewer_ids.include?(approver_id.to_s)
+
+    errors.add(
+      :approver_id,
+      I18n.t("errors.artifact.review_roles_must_be_separate")
     )
   end
 end
