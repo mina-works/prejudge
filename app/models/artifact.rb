@@ -22,6 +22,7 @@ class Artifact < ApplicationRecord
   validates :review_deadline,presence: true
 
   validate :review_deadline_cannot_be_past
+  validate :approver_must_be_selected
 
 
   # フォームから渡されたReviewer IDを返す。
@@ -205,5 +206,14 @@ class Artifact < ApplicationRecord
         I18n.t("errors.artifact.review_deadline_cannot_be_past")
       )
     end
+  end
+
+  def approver_must_be_selected
+    return if approver_id.present?
+
+    errors.add(
+      :approver_id,
+      I18n.t("errors.artifact.approver_required")
+    )
   end
 end

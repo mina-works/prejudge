@@ -8,6 +8,7 @@ ja:
         review_deadline: レビュー期限
         creator: 制作者
         created_at: 作成日
+        approver_id: 承認者
 
       artifact_reviewer:
         user: ユーザー
@@ -65,6 +66,7 @@ ja:
     artifact:
       review_deadline_cannot_be_past: は現在より後の日時を指定してください
       not_submittable: 提出できません
+      approver_required: を選択してください
 
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません

@@ -34,10 +34,12 @@ class ArtifactsController < ApplicationController
     redirect_to @artifact
 
   rescue ActiveRecord::RecordInvalid => e
-    @artifact.errors.add(
-      :base,
-      e.record.errors.full_messages.join(", ")
-    )
+    # Artifact以外の関連モデルで発生したエラーだけを追加する
+    unless e.record.equal?(@artifact)
+      e.record.errors.full_messages.each do |message|
+        @artifact.errors.add(:base, message)
+      end
+    end
 
     @users = User.all
 
@@ -60,10 +62,13 @@ class ArtifactsController < ApplicationController
     redirect_to @artifact
 
   rescue ActiveRecord::RecordInvalid => e
-    @artifact.errors.add(
-      :base,
-      e.record.errors.full_messages.join(", ")
-    )
+    # ArtifactReviewerなど、Artifact以外で発生したエラーだけを
+    # Artifactのエラーとしてフォームに表示する
+    unless e.record.equal?(@artifact)
+      e.record.errors.full_messages.each do |message|
+        @artifact.errors.add(:base, message)
+      end
+    end
 
     @users = User.all
 
