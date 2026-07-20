@@ -97,23 +97,6 @@ class Artifact < ApplicationRecord
     revision_required?
   end
 
-  # Reviewer・Approverを割り当てる
-  def assign_review_members(reviewer_ids, approver_id)
-    artifact_reviewers.destroy_all
-
-    reviewer_ids.reject(&:blank?).each do |user_id|
-      artifact_reviewers.create!(
-        user_id: user_id,
-        role: :reviewer
-      )
-    end
-
-    artifact_reviewers.create!(
-      user_id: approver_id,
-      role: :approver
-    )
-  end
-
   # approverを表示
   def approver
     artifact_reviewers.approver.first&.user
@@ -188,6 +171,7 @@ class Artifact < ApplicationRecord
 
   private
 
+  # Reviewer・Approverを登録し直す
   def replace_review_members!
     artifact_reviewers.destroy_all
 
@@ -204,6 +188,7 @@ class Artifact < ApplicationRecord
     )
   end
 
+  # Reviewer IDを保存用に正規化する
   def normalized_reviewer_ids
     Array(reviewer_ids)
       .reject(&:blank?)

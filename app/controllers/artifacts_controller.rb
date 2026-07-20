@@ -50,23 +50,11 @@ class ArtifactsController < ApplicationController
   end
 
   def update
-    artifact_attributes = artifact_params.except(
-        :reviewer_ids,
-        :approver_id
-      )
+    # DBへ保存せず、フォームの入力値を@artifactへ代入する
+    @artifact.assign_attributes(artifact_params)
 
-    reviewer_ids = artifact_params[:reviewer_ids]
-    approver_id  = artifact_params[:approver_id]
-
-    # ArtifactとReviewer・Approverを一緒に更新する
-    Artifact.transaction do
-      @artifact.update!(artifact_attributes)
-
-      @artifact.assign_review_members(
-        reviewer_ids,
-        approver_id
-      )
-    end
+    # Artifact本体とReviewer・Approverをまとめて保存する
+    @artifact.save_with_review_members!
 
     flash[:notice] = t("flash.artifact.updated")
     redirect_to @artifact

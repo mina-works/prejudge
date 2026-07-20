@@ -9,14 +9,15 @@ ja:
         creator: 制作者
         created_at: 作成日
 
+      artifact_reviewer:
+        user: ユーザー
+
       review:
         result: 判定結果
         round: レビュー回
         comment: コメント
         user: レビューした人
 
-      reviewIssue:
-      user:
 
   common:
     create: 作成
@@ -59,6 +60,7 @@ ja:
   errors:
     messages:
       blank: を入力してください
+      required: を選択してください
 
     artifact:
       review_deadline_cannot_be_past: は現在より後の日時を指定してください
