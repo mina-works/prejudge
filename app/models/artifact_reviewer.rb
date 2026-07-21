@@ -8,4 +8,10 @@ class ArtifactReviewer < ApplicationRecord
   }
 
   validates :role, presence: true
+
+  # 同じArtifactに同じユーザーを重複登録できない
+  validates :user_id,
+            uniqueness: {
+              scope: :artifact_id
+            }
 end
