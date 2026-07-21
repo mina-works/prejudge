@@ -13,6 +13,20 @@ class Review < ApplicationRecord
   }
 
 
+  validates :result, presence: true
+  validates :user_id,
+          uniqueness: {
+            scope: [:artifact_id, :round],
+            message: :already_reviewed_this_round
+          }
+  validates :round,
+          presence: true,
+          numericality: {
+            only_integer: true,
+            greater_than: 0
+          }
+
+
   # review作成時点のartifact.current_roundを保持する
   # 過去review履歴を固定保存するため、初回のみセットする
   before_validation :set_round
@@ -21,13 +35,6 @@ class Review < ApplicationRecord
   # approverのreview結果に応じてartifact.statusを更新する
   # reviewerのreviewはstatusに影響しない
   after_create :update_artifact_status
-
-
-  validates :user_id,
-          uniqueness: {
-            scope: [:artifact_id, :round],
-            message: :already_reviewed_this_round
-          }
 
 
   # review履歴保護のため、過去roundのreview編集を禁止する
@@ -76,9 +83,11 @@ class Review < ApplicationRecord
   end
 
   def prevent_edit_past_review
-    if round < artifact.current_round
+    # 比較できない場合は終了する
+    return if round.blank? || artifact.blank?
+
+    return unless round < artifact.current_round
       errors.add(:base, I18n.t("errors.review.prevent_edit_past_review"))
-    end
   end
 
   # このreviewを行ったuserが、
