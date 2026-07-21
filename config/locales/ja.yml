@@ -17,7 +17,8 @@ ja:
         result: 判定結果
         round: レビュー回
         comment: コメント
-        user: レビューした人
+        user: レビュアー
+        user_id: レビュー担当者
 
 
   common:
@@ -62,6 +63,7 @@ ja:
     messages:
       blank: を入力してください
       required: を選択してください
+      already_reviewed_this_round: は、このラウンドですでにレビュー済みです
 
     artifact:
       review_deadline_cannot_be_past: は現在より後の日時を指定してください

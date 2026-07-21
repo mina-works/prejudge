@@ -43,11 +43,7 @@ class ReviewsController < ApplicationController
       flash[:notice] = t("flash.review.created")
       redirect_to [@artifact, @review]
 
-    rescue ActiveRecord::RecordInvalid => e
-      @review.errors.add(
-        :base,
-        e.record.errors.full_messages.join(", ")
-      )
+    rescue ActiveRecord::RecordInvalid
       
       render :new, status: :unprocessable_entity
     end

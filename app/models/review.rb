@@ -23,6 +23,13 @@ class Review < ApplicationRecord
   after_create :update_artifact_status
 
 
+  validates :user_id,
+          uniqueness: {
+            scope: [:artifact_id, :round],
+            message: :already_reviewed_this_round
+          }
+
+
   # review履歴保護のため、過去roundのreview編集を禁止する
   validate :prevent_edit_past_review, on: :update
 
