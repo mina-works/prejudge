@@ -69,7 +69,9 @@ ja:
       review_deadline_cannot_be_past: は現在より後の日時を指定してください
       not_submittable: 提出できません
       approver_required: を選択してください
-      review_roles_must_be_separate: とレビュアーは同じユーザーを選択できません
+      review_roles_must_be_separate: レビュアーと承認者には別のユーザーを指定してください
+      creator_cannot_be_reviewer: 作成者をレビュアーに指定することはできません
+      creator_cannot_be_approver: 作成者を承認者に指定することはできません
 
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません

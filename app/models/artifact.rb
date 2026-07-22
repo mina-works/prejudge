@@ -24,6 +24,7 @@ class Artifact < ApplicationRecord
   validate :review_deadline_cannot_be_past
   validate :approver_must_be_selected
   validate :reviewer_and_approver_must_be_different
+  validate :creator_cannot_be_review_member
 
 
   # フォームから渡されたReviewer IDを返す。
@@ -224,8 +225,29 @@ class Artifact < ApplicationRecord
     return unless normalized_reviewer_ids.include?(approver_id.to_s)
 
     errors.add(
-      :approver_id,
+      :base,
       I18n.t("errors.artifact.review_roles_must_be_separate")
     )
+  end
+
+  # CreatorはReviewer・Approverになれない
+  def creator_cannot_be_review_member
+    return if creator.blank?
+
+    creator_id_str = creator_id.to_s
+
+    if normalized_reviewer_ids.include?(creator_id_str)
+      errors.add(
+        :base,
+        I18n.t("errors.artifact.creator_cannot_be_reviewer")
+      )
+    end
+
+    if approver_id.to_s == creator_id_str
+      errors.add(
+        :base,
+        I18n.t("errors.artifact.creator_cannot_be_approver")
+      )
+    end
   end
 end
