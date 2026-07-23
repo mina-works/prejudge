@@ -1,7 +1,14 @@
 class ArtifactsController < ApplicationController
 
   before_action :set_artifact,
-                only: [:show, :edit, :update, :submit, :resubmit]
+                only: %i[
+                  show
+                  edit
+                  update
+                  submit
+                  resubmit
+                  destroy
+                ]
   
   before_action :ensure_editable,
   only: [:edit, :update]
@@ -73,6 +80,18 @@ class ArtifactsController < ApplicationController
     @users = User.all
 
     render :edit, status: :unprocessable_entity
+  end
+
+  def destroy
+    if @artifact.destroy
+      redirect_to artifacts_path,
+                  notice: "成果物を削除しました。",
+                  status: :see_other
+    else
+      redirect_to @artifact,
+                  alert: @artifact.errors.full_messages.to_sentence,
+                  status: :see_other
+    end
   end
 
   def submit

@@ -18,6 +18,9 @@ class Artifact < ApplicationRecord
     reviewed: 4
   }
 
+  # destroyが実行される直前に、削除可能な状態か確認する
+  before_destroy :ensure_deletable
+
   validates :title,presence: true
   validates :review_deadline,presence: true
 
@@ -93,6 +96,11 @@ class Artifact < ApplicationRecord
   # 成果物が編集可能なステータスか判定する
   def editable?
     draft? || revision_required?
+  end
+
+  # Artifactを削除できる状態か判定する
+  def deletable?
+    draft?
   end
 
   # 再提出可能なステータスか判定する
@@ -249,5 +257,13 @@ class Artifact < ApplicationRecord
         I18n.t("errors.artifact.creator_cannot_be_approver")
       )
     end
+  end
+
+  # 削除できない状態の場合はdestroyを中止する
+  def ensure_deletable
+    return if deletable?
+
+    errors.add(:base, I18n.t("errors.artifact.cannot_delete"))
+    throw(:abort)
   end
 end

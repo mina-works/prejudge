@@ -72,12 +72,13 @@ ja:
       review_roles_must_be_separate: レビュアーと承認者には別のユーザーを指定してください
       creator_cannot_be_reviewer: 作成者をレビュアーに指定することはできません
       creator_cannot_be_approver: 作成者を承認者に指定することはできません
+      cannot_delete: レビュー依頼中またはレビュー完了後の成果物は削除できません。
 
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません
       reviewer_cannot_select_ng: レビュアーはNGを選択できません
       user_must_be_review_member: はこの成果物のレビュー担当者ではありません
-      artifact_must_be_reviewable: 現在のステータスではレビューをすることができません
+      artifact_must_be_reviewable: レビュー依頼後の成果物は削除できません。
 
     review_issue:
       review_is_ok: OKを選択したレビューには違和感を登録できません
