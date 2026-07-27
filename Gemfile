@@ -47,6 +47,9 @@ gem "bootsnap", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
+
+  # Rails 7.1はMinitest 6と互換性がないため、5系に固定する
+  gem "minitest", "< 6"
 end
 
 group :development do
