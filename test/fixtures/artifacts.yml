@@ -4,14 +4,22 @@ one:
   title: MyString
   description: MyText
   creator: one
-  status: 1
+  status: pending_review
   current_round: 1
-  review_deadline: 2026-04-21 15:39:49
+  review_deadline: 2027-04-21 15:39:49
 
 two:
   title: MyString
   description: MyText
   creator: two
-  status: 1
+  status: pending_review
   current_round: 1
-  review_deadline: 2026-04-21 15:39:49
+  review_deadline: 2027-04-21 15:39:49
+
+draft_artifact:
+  title: Draft Artifact
+  description: 削除テスト用
+  creator: one
+  status: draft
+  current_round: 1
+  review_deadline: <%= 1.week.from_now %>
