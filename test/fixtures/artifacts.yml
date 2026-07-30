@@ -1,17 +1,25 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  title: MyString
-  description: MyText
+  title: Pending Review Artifact
+  description: 削除不可テスト用
   creator: one
-  status: 1
+  status: pending_review
   current_round: 1
-  review_deadline: 2026-04-21 15:39:49
+  review_deadline: <%= 1.week.from_now %>
 
 two:
   title: MyString
   description: MyText
   creator: two
-  status: 1
+  status: pending_review
   current_round: 1
-  review_deadline: 2026-04-21 15:39:49
+  review_deadline: 2027-04-21 15:39:49
+
+draft_artifact:
+  title: Draft Artifact
+  description: 削除テスト用
+  creator: one
+  status: draft
+  current_round: 1
+  review_deadline: <%= 1.week.from_now %>
