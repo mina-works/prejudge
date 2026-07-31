@@ -18,27 +18,20 @@ class ReviewsController < ApplicationController
   end
 
   def create
-    permitted_review = params.require(:review).permit(
-      :user_id,
-      :result,
-      :comment,
-      issue_types: []
-    )
+    # Strong Parametersで許可した値を取得する
+    permitted_review = review_params
 
+    # Reviewテーブルに存在しないissue_typesを取り出す
     issue_types = permitted_review.delete(:issue_types)
 
+    # Artifactに関連付いたReviewを組み立てる
     @review = @artifact.reviews.build(
       permitted_review
     )
 
     begin
-      Review.transaction do
-        @review.save!
-
-        @review.create_review_issues(
-          issue_types
-        )
-      end
+      # Review本体とReviewIssueの保存はModelに任せる
+      @review.save_with_review_issues!(issue_types)
 
       flash[:notice] = t("flash.review.created")
       redirect_to [@artifact, @review]
@@ -55,6 +48,16 @@ class ReviewsController < ApplicationController
   def set_artifact
     @artifact = Artifact.find(
       params[:artifact_id]
+    )
+  end
+
+  # フォームから送られたReview用の値だけを許可する
+  def review_params
+    params.require(:review).permit(
+      :user_id,
+      :result,
+      :comment,
+      issue_types: []
     )
   end
 
