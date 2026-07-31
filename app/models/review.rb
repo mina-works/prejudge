@@ -76,6 +76,14 @@ class Review < ApplicationRecord
     end
   end
 
+  # Review本体とReviewIssueをトランザクション内で保存する
+  def save_with_review_issues!(issue_types)
+    self.class.transaction do
+      save!
+      create_review_issues!(issue_types)
+    end
+  end
+
   private
 
   def set_round
@@ -130,5 +138,12 @@ class Review < ApplicationRecord
       :artifact,
       I18n.t("errors.review.artifact_must_be_reviewable")
     )
+  end
+
+  # 選択された違和感項目を保存する
+  def create_review_issues!(issue_types)
+    Array(issue_types).reject(&:blank?).each do |issue_type|
+      review_issues.create!(issue_type: issue_type)
+    end
   end
 end
