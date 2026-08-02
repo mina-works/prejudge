@@ -19,6 +19,32 @@
     <%= form.text_area :description %>
   </div>
 
+  <%# ファイル %>
+  <div>
+    <%= form.label :file, t("common.file") %>
+
+    <% if @artifact.file.attached? %>
+      <p>
+        現在のファイル：
+        <%= link_to(
+          @artifact.file.filename.to_s,
+          rails_blob_path(
+            @artifact.file,
+            disposition: "attachment"
+          )
+        ) %>
+      </p>
+    <% else %>
+      <p>現在、ファイルは登録されていません。</p>
+    <% end %>
+
+    <%= form.file_field :file %>
+
+    <p>
+      ※新しいファイルを選択すると、現在のファイルが差し替えられます。
+    </p>
+  </div>
+
   <div>
     <%= form.label :review_deadline %>
     <%= form.date_field :review_deadline %>

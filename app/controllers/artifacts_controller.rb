@@ -129,6 +129,7 @@ class ArtifactsController < ApplicationController
       :creator_id,
       :review_deadline,
       :approver_id,
+      :file,
       reviewer_ids: []
     )
   end

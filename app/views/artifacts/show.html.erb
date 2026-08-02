@@ -20,6 +20,18 @@
   <%= @artifact.description %>
 </p>
 
+<% if @artifact.file.attached? %>
+  <p>
+    <%= t("common.file") %>:
+    <%= link_to(
+      @artifact.file.filename,
+      rails_blob_path(@artifact.file, disposition: "attachment")
+    ) %>
+  </p>
+<% else %>
+  <p>成果物ファイルは添付されていません。</p>
+<% end %>
+
 <p>
   <%= t("common.approver")%>:
   <%= @artifact.approver&.name %>
