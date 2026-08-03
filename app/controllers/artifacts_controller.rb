@@ -11,16 +11,18 @@ class ArtifactsController < ApplicationController
                 ]
   
   before_action :ensure_editable,
-  only: [:edit, :update]
+  only: %i[edit update]
 
   before_action :ensure_resubmittable,
-  only: [:resubmit]
+  only: %i[resubmit]
 
   before_action :ensure_submittable,
-  only: [:submit]
+  only: %i[submit]
 
   def index
-    @artifacts = Artifact.all
+    @artifacts = Artifact
+                  .includes(:creator, artifact_reviewers: :user)
+                  .order(created_at: :desc)
   end
 
   def show
@@ -85,7 +87,7 @@ class ArtifactsController < ApplicationController
   def destroy
     if @artifact.destroy
       redirect_to artifacts_path,
-                  notice: "成果物を削除しました。",
+                  notice: t("flash.artifact.destroyed"),
                   status: :see_other
     else
       redirect_to @artifact,

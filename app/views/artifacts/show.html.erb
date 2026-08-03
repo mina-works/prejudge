@@ -108,14 +108,14 @@
 
 <%# 削除 %>
 <% if @artifact.deletable? %>
-  <%= button_to "削除",
+  <%= button_to t(".destroy"),
                 artifact_path(@artifact),
                 method: :delete,
                 data: {
-                  turbo_confirm: "この成果物を削除しますか？"
+                  turbo_confirm: t(".destroy_confirm")
                 } %>
 <% else %>
-  <p>レビュー依頼後またはレビュー完了後の成果物は削除できません。</p>
+  <p><%= t(".cannot_delete_description") %></p>
 <% end %>
 
 <%# 一覧へ戻る %>
