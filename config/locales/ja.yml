@@ -20,6 +20,9 @@ ja:
         user: レビュアー
         user_id: レビュー担当者
 
+  time:
+    formats:
+      short: "%Y/%m/%d"
 
   common:
     create: 作成
@@ -27,10 +30,12 @@ ja:
     delete: 削除
     back: 戻る
     back_to_list: 一覧へ戻る
-    submit: 送信
+    submit: 登録
     edit: 編集
     approver: 承認者
     reviewer:  レビュアー
+    actions: 操作
+    show: 詳細
     file: 成果物ファイル
 
   artifacts:
@@ -42,6 +47,9 @@ ja:
       review_count: レビュー数
       resubmit: 再提出
       submit: 提出
+      destroy: 削除
+      destroy_confirm: この成果物を削除しますか？
+      cannot_delete_description: レビュー依頼後またはレビュー完了後の成果物は削除できません。
     
     new:
       title: 成果物登録
@@ -119,3 +127,4 @@ ja:
       not_editable: この成果物は現在編集できません
       not_resubmittable: この成果物は再提出できません
       not_submittable: この成果物は提出できません
+      destroyed: 成果物を削除しました。
