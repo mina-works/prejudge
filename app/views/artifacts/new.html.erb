@@ -20,6 +20,11 @@
   </div>
 
   <div>
+    <%= form.label :file, t("common.file") %>
+    <%= form.file_field :file %>
+  </div>
+
+  <div>
     <%= form.label :review_deadline %>
     <%= form.date_field :review_deadline %>
   </div>

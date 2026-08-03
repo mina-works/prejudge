@@ -30,12 +30,13 @@ ja:
     delete: 削除
     back: 戻る
     back_to_list: 一覧へ戻る
-    submit: 送信
+    submit: 登録
     edit: 編集
     approver: 承認者
     reviewer:  レビュアー
     actions: 操作
     show: 詳細
+    file: 成果物ファイル
 
   artifacts:
     index:

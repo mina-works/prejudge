@@ -6,6 +6,7 @@ class Artifact < ApplicationRecord
   has_many :review_members, through: :artifact_reviewers, source: :user
 
   has_one :review_condition, dependent: :destroy
+  has_one_attached :file
 
   attr_writer :reviewer_ids, :approver_id
 
