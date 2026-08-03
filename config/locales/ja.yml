@@ -9,6 +9,7 @@ ja:
         creator: 制作者
         created_at: 作成日
         approver_id: 承認者
+        file: 成果物ファイル
 
       artifact_reviewer:
         user: ユーザー
@@ -82,6 +83,7 @@ ja:
       creator_cannot_be_reviewer: 作成者をレビュアーに指定することはできません
       creator_cannot_be_approver: 作成者を承認者に指定することはできません
       cannot_delete: レビュー依頼中またはレビュー完了後の成果物は削除できません。
+      file_required: を添付してください
 
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません

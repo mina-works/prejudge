@@ -68,7 +68,17 @@ class Artifact < ApplicationRecord
   end
 
   # 成果物をレビュー依頼する
+  # 提出時にはファイル必須
   def submit!
+    unless file.attached?
+      errors.add(
+        :file,
+        I18n.t("errors.artifact.file_required")
+      )
+
+      raise ActiveRecord::RecordInvalid.new(self)
+    end
+
     unless submittable?
       errors.add(
         :base,
