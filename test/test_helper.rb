@@ -13,3 +13,18 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+
+module AuthenticationTestHelper
+  # 指定したUserとしてログインする
+  def log_in_as(user, password: "password")
+    post session_path, params: {
+      email: user.email,
+      password: password
+    }
+  end
+end
+
+class ActionDispatch::IntegrationTest
+  include AuthenticationTestHelper
+end

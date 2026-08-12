@@ -1,11 +1,9 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+role_reviewer:
+  artifact: review_test_artifact
+  user: reviewer
+  role: reviewer
 
-one:
-  artifact: one
-  user: one
-  role: 1
-
-two:
-  artifact: two
-  user: two
-  role: 1
+role_approver:
+  artifact: review_test_artifact
+  user: approver
+  role: approver

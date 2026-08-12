@@ -36,7 +36,10 @@ class ArtifactsController < ApplicationController
   end
 
   def create
-    @artifact = Artifact.new(artifact_params)
+    # Artifactの作成者はログイン中のユーザーに固定する
+    @artifact = current_user.artifacts.build(
+      artifact_params
+    )
     @artifact.save_with_review_members!
 
     flash[:notice] = t("flash.artifact.created")
@@ -128,7 +131,6 @@ class ArtifactsController < ApplicationController
     params.require(:artifact).permit(
       :title,
       :description,
-      :creator_id,
       :review_deadline,
       :approver_id,
       :file,
