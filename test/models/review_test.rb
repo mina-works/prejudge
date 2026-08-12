@@ -3,20 +3,9 @@ require "test_helper"
 class ReviewTest < ActiveSupport::TestCase
   setup do
     # テストごとにCreator・Reviewer・Approverを用意する
-    @creator = User.create!(
-      name: "Creator",
-      email: "creator@example.com"
-    )
-
-    @reviewer = User.create!(
-      name: "Reviewer",
-      email: "reviewer@example.com"
-    )
-
-    @approver = User.create!(
-      name: "Approver",
-      email: "approver@example.com"
-    )
+    @creator = users(:creator)
+    @reviewer = users(:reviewer)
+    @approver = users(:approver)
 
     # Artifact本体とレビュー担当者を、
     # 実際のアプリと同じ保存処理を使って作成する

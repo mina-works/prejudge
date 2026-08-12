@@ -25,8 +25,9 @@ class ReviewsController < ApplicationController
     issue_types = permitted_review.delete(:issue_types)
 
     # Artifactに関連付いたReviewを組み立てる
+    # レビューした人はログイン中のユーザーに固定する
     @review = @artifact.reviews.build(
-      permitted_review
+      permitted_review.merge(user: current_user)
     )
 
     begin
@@ -54,7 +55,6 @@ class ReviewsController < ApplicationController
   # フォームから送られたReview用の値だけを許可する
   def review_params
     params.require(:review).permit(
-      :user_id,
       :result,
       :comment,
       issue_types: []

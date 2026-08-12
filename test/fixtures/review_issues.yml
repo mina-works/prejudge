@@ -1,9 +1,11 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+reviewer_wrong_atmosphere:
+  review: reviewer_review
+  issue_type: wrong_atmosphere
 
-one:
-  review: one
-  issue_type: 1
+reviewer_tone_mismatch:
+  review: reviewer_review
+  issue_type: tone_mismatch
 
-two:
-  review: two
-  issue_type: 1
+approver_wrong_target:
+  review: approver_review
+  issue_type: wrong_target

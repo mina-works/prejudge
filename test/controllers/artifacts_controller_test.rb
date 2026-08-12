@@ -1,9 +1,17 @@
 require "test_helper"
 
 class ArtifactsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    # ArtifactのCreatorとして使うUserをfixtureから取得する
+    @creator = users(:creator)
+  end
+
   test "draftのArtifactを削除できる" do
     # 削除可能なdraft状態のArtifactをfixtureから取得する
     artifact = artifacts(:draft_artifact)
+
+    # ArtifactのCreatorとしてログインする
+    log_in_as(artifact.creator)
 
     # DELETEリクエストによってArtifactが1件減ることを確認する
     assert_difference("Artifact.count", -1) do
@@ -21,8 +29,10 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "pending_reviewのArtifactは削除できない" do
+    log_in_as(@creator)
+    
     # 削除できないpending_review状態のArtifactをfixtureから取得する
-    artifact = artifacts(:one)
+    artifact = artifacts(:pending_review_artifact)
 
     # DELETEリクエストを送ってもArtifact件数が変わらないことを確認する
     assert_no_difference("Artifact.count") do

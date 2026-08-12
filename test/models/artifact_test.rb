@@ -12,8 +12,8 @@ class ArtifactTest < ActiveSupport::TestCase
   end
 
   test "pending_reviewのArtifactは削除できない" do
-    # artifacts(:one)はfixture上でpending_reviewになっている
-    artifact = artifacts(:one)
+    # pending_review_artifactはfixture上でpending_reviewになっている
+    artifact = artifacts(:pending_review_artifact)
 
     # destroyを実行してもArtifactの件数が変わらないことを確認する
     assert_no_difference("Artifact.count") do

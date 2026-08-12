@@ -21,6 +21,9 @@ ja:
         user: レビュアー
         user_id: レビュー担当者
 
+      session:
+        email: メールアドレス
+
   time:
     formats:
       short: "%Y/%m/%d"
@@ -69,11 +72,16 @@ ja:
       title: レビュー作成
       review_issue_reason: 違和感の理由
 
+  sessions:
+    new:
+      login: ログイン
+
   errors:
     messages:
       blank: を入力してください
       required: を選択してください
       already_reviewed_this_round: は、このラウンドですでにレビュー済みです
+      confirmation: と一致しません
 
     artifact:
       review_deadline_cannot_be_past: は現在より後の日時を指定してください
@@ -130,3 +138,9 @@ ja:
       not_resubmittable: この成果物は再提出できません
       not_submittable: この成果物は提出できません
       destroyed: 成果物を削除しました。
+
+    session: 
+      created: ログインしました
+      invalid: ログインできません
+      destroyed: ログアウトしました
+      login_required: ログインしてください
