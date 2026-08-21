@@ -1,6 +1,6 @@
 pending_review_artifact:
   title: Pending Review Artifact
-  description: 削除不可テスト用
+  description: 状態不可テスト用
   creator: creator
   status: pending_review
   current_round: 1
@@ -16,7 +16,23 @@ review_test_artifact:
 
 draft_artifact:
   title: Draft Artifact
-  description: 削除テスト用
+  description: ステータス：draft テスト用
+  creator: creator
+  status: draft
+  current_round: 1
+  review_deadline: <%= 1.week.from_now %>
+
+review_create_test_artifact:
+  title: Review Create Test Artifact
+  description: ReviewsController作成テスト用
+  creator: creator
+  status: pending_review
+  current_round: 1
+  review_deadline: <%= 1.week.from_now %>
+
+update_test_artifact:
+  title: Update Test Artifact
+  description: Artifact更新テスト用
   creator: creator
   status: draft
   current_round: 1

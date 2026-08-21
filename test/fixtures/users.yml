@@ -12,3 +12,8 @@ approver:
   name: Approver
   email: approver@example.com
   password_digest: <%= BCrypt::Password.create("password") %>
+
+unassigned_user:
+  name: Unassigned User
+  email: unassigned_user@example.com
+  password_digest: <%= BCrypt::Password.create("password") %>
