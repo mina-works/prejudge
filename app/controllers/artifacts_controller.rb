@@ -10,6 +10,9 @@ class ArtifactsController < ApplicationController
                   destroy
                 ]
   
+  before_action :ensure_creator,
+  only: %i[edit update destroy submit resubmit]
+
   before_action :ensure_editable,
   only: %i[edit update]
 
@@ -136,6 +139,14 @@ class ArtifactsController < ApplicationController
       :file,
       reviewer_ids: []
     )
+  end
+
+  # ArtifactのCreatorだけが編集・更新・削除・提出・再提出ができる
+  def ensure_creator
+    return if @artifact.creator == current_user
+
+    redirect_to @artifact,
+                alert: t("flash.artifact.not_authorized")
   end
 
   def ensure_editable

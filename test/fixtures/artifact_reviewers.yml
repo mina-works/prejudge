@@ -1,9 +1,29 @@
 role_reviewer:
-  artifact: review_test_artifact
+  artifact: draft_artifact
   user: reviewer
   role: reviewer
 
 role_approver:
-  artifact: review_test_artifact
+  artifact: draft_artifact
+  user: approver
+  role: approver
+
+review_create_test_reviewer:
+  artifact: review_create_test_artifact
+  user: reviewer
+  role: reviewer
+
+review_create_test_approver:
+  artifact: review_create_test_artifact
+  user: approver
+  role: approver
+
+update_test_reviewer:
+  artifact: update_test_artifact
+  user: reviewer
+  role: reviewer
+
+update_test_approver:
+  artifact: update_test_artifact
   user: approver
   role: approver
