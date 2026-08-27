@@ -27,3 +27,13 @@ update_test_approver:
   artifact: update_test_artifact
   user: approver
   role: approver
+
+revision_required_reviewer:
+  artifact: revision_required_artifact
+  user: reviewer
+  role: reviewer
+
+revision_required_approver:
+  artifact: revision_required_artifact
+  user: approver
+  role: approver

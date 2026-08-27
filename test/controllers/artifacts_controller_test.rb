@@ -7,6 +7,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     @approver = users(:approver)
     @artifact = artifacts(:draft_artifact)
     @pending_review_artifact = artifacts(:pending_review_artifact)
+    @revision_required_artifact = artifacts(:revision_required_artifact)
     @update_artifact = artifacts(:update_test_artifact)
   end
 
@@ -211,7 +212,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     # 状態不適合を知らせるメッセージが設定される
     assert flash[:alert].present?
-    
+
     @pending_review_artifact.reload
     assert_equal original_title, @pending_review_artifact.title
   end
@@ -270,6 +271,92 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_status, @artifact.reload.status
   end
 
+  ### 認可
+  test "Creator以外はdraftのArtifactを提出できない" do
+    log_in_as(@reviewer)
+
+    # 認可以外の提出条件を満たすため、テスト用ファイルを添付する
+    @artifact.file.attach(
+      io: File.open(
+        Rails.root.join("test/fixtures/files/sample.txt")
+      ),
+      filename: "sample.txt",
+      content_type: "text/plain"
+    )
+
+    original_status = @artifact.status
+
+    patch submit_artifact_path(@artifact)
+
+    assert_redirected_to artifact_path(@artifact)
+    assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
+    assert_equal original_status, @artifact.reload.status
+  end
+
+  ### 状態
+  test "pending_reviewのArtifactは提出できない" do
+    log_in_as(@creator)
+
+    original_status = @pending_review_artifact.status
+
+    patch submit_artifact_path(@pending_review_artifact)
+
+    assert_redirected_to artifact_path(@pending_review_artifact)
+    assert_equal I18n.t("flash.artifact.not_submittable"), flash[:alert]
+    assert_equal original_status, @pending_review_artifact.reload.status
+  end
+
+  ## 再提出
+  ### 正常系
+  test "Creatorはrevision_requiredのArtifactを再提出できる" do
+    log_in_as(@creator)
+
+    original_round = @revision_required_artifact.current_round
+
+    patch resubmit_artifact_path(@revision_required_artifact)
+
+    assert_redirected_to artifact_path(@revision_required_artifact)
+    assert_predicate flash[:notice], :present?
+
+    @revision_required_artifact.reload
+    assert_predicate @revision_required_artifact, :pending_review?
+    assert_equal original_round + 1, @revision_required_artifact.current_round
+  end
+
+  ### 認可
+  test "Creator以外はrevision_requiredのArtifactを再提出できない" do
+    log_in_as(@reviewer)
+
+    original_status = @revision_required_artifact.status
+    original_round = @revision_required_artifact.current_round
+
+    patch resubmit_artifact_path(@revision_required_artifact)
+
+    assert_redirected_to artifact_path(@revision_required_artifact)
+    assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
+
+    @revision_required_artifact.reload
+    assert_equal original_status, @revision_required_artifact.status
+    assert_equal original_round, @revision_required_artifact.current_round
+  end
+
+  ### 状態
+  test "draftのArtifactは再提出できない" do
+    log_in_as(@creator)
+
+    original_status = @artifact.status
+    original_round = @artifact.current_round
+
+    patch resubmit_artifact_path(@artifact)
+
+    assert_redirected_to artifact_path(@artifact)
+    assert_equal I18n.t("flash.artifact.not_resubmittable"), flash[:alert]
+
+    @artifact.reload
+    assert_equal original_status, @artifact.status
+    assert_equal original_round, @artifact.current_round
+  end
+
   ## destroy
   ### 正常系
   test "draftのArtifactを削除できる" do
@@ -308,5 +395,18 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     # エラーメッセージがalertに設定されていることを確認する
     assert_predicate flash[:alert], :present?
+  end
+
+  ### 認可
+  test "Creator以外はdraftのArtifactを削除できない" do
+    log_in_as(@reviewer)
+
+    assert_no_difference("Artifact.count") do
+      delete artifact_url(@artifact)
+    end
+
+    assert_redirected_to artifact_url(@artifact)
+    assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
+    assert Artifact.exists?(@artifact.id)
   end
 end
