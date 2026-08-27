@@ -138,7 +138,7 @@ ja:
       not_resubmittable: この成果物は再提出できません
       not_submittable: この成果物は提出できません
       destroyed: 成果物を削除しました。
-      not_authorized: Creatorだけが編集・更新できます
+      not_authorized: Creatorだけが操作できます
 
     session: 
       created: ログインしました

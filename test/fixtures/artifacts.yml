@@ -37,3 +37,11 @@ update_test_artifact:
   status: draft
   current_round: 1
   review_deadline: <%= 1.week.from_now %>
+
+revision_required_artifact:
+  title: Revision Required Artifact
+  description: Artifact再提出テスト用
+  creator: creator
+  status: revision_required
+  current_round: 1
+  review_deadline: <%= 1.week.from_now %>
