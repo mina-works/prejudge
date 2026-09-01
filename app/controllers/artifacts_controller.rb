@@ -22,10 +22,27 @@ class ArtifactsController < ApplicationController
   before_action :ensure_submittable,
   only: %i[submit]
 
-  def index
-    @artifacts = Artifact
+ def index
+    # Reviewerとして対応可能なArtifactを取得する
+    @reviewer_artifacts =
+      current_user.reviewer_artifacts
                   .includes(:creator, artifact_reviewers: :user)
-                  .order(created_at: :desc)
+                  .where(status: %i[pending_review reviewing])
+                  .order(review_deadline: :asc, created_at: :asc)
+
+    # Approverとしてレビュー完了まで確認するArtifactを取得する
+    @approver_artifacts =
+      current_user.approver_artifacts
+                  .includes(:creator)
+                  .where(status: %i[pending_review reviewing revision_required])
+                  .order(review_deadline: :asc, created_at: :asc)
+
+    # Creatorとして作成した未完了Artifactを取得する
+    @created_artifacts =
+      current_user.artifacts
+                  .includes(artifact_reviewers: :user)
+                  .where.not(status: :reviewed)
+                  .order(review_deadline: :asc, created_at: :asc)
   end
 
   def show

@@ -15,6 +15,26 @@ class User < ApplicationRecord
   has_many :reviews,
             dependent: :restrict_with_error
 
+   # Reviewerとしての担当情報を取得する
+  has_many :reviewer_assignments,
+           -> { reviewer },
+           class_name: "ArtifactReviewer"
+
+  # Reviewerとして担当しているArtifactを取得する
+  has_many :reviewer_artifacts,
+           through: :reviewer_assignments,
+           source: :artifact
+
+  # Approverとしての担当情報を取得する
+  has_many :approver_assignments,
+          -> { approver },
+          class_name: "ArtifactReviewer"
+
+  # Approverとして担当しているArtifactを取得する
+  has_many :approver_artifacts,
+          through: :approver_assignments,
+          source: :artifact
+
   has_secure_password
 
   # validations
