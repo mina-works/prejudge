@@ -1,73 +1,93 @@
 <h1><%= t(".title") %></h1>
 
-<table>
+<h2><%= t(".reviewer_title") %></h2>
+
+<table id="reviewer-artifacts">
   <thead>
     <tr>
       <th><%= Artifact.human_attribute_name(:title) %></th>
       <th><%= Artifact.human_attribute_name(:creator) %></th>
-      <th><%= t("common.reviewer") %></th>
       <th><%= t("common.approver") %></th>
-      <th><%= Artifact.human_attribute_name(:status) %></th>
       <th><%= Review.human_attribute_name(:round) %></th>
       <th><%= Artifact.human_attribute_name(:review_deadline) %></th>
-      <th><%= t("common.actions") %></th>
     </tr>
   </thead>
 
   <tbody>
-    <% @artifacts.each do |artifact| %>
+    <% @reviewer_artifacts.each do |artifact| %>
       <tr>
-        <td>
-          <%= link_to artifact.title, artifact_path(artifact) %>
-        </td>
-
-        <td>
-          <%= artifact.creator.name %>
-        </td>
-
-        <td>
-          <%= artifact.reviewers.map(&:name).join(", ").presence || "-" %>
-        </td>
-
-        <td>
-          <%= artifact.approver&.name || "-" %>
-        </td>
-
-        <td>
-          <%= artifact.status_label %>
-        </td>
-
-        <td>
-          <%= artifact.current_round %>
-        </td>
-
-        <td>
-          <%= l artifact.review_deadline, format: :short %>
-        </td>
-
-        <td>
-          <%= link_to t("common.show"), artifact_path(artifact) %>
-
-          <% if artifact.editable? %>
-            <%= link_to t("common.edit"), edit_artifact_path(artifact) %>
-          <% end %>
-
-          <% if artifact.deletable? %>
-            <%= button_to(
-              t("common.delete"),
-              artifact_path(artifact),
-              method: :delete,
-              form: {
-                data: {
-                  turbo_confirm: t(
-                    "artifacts.index.delete_confirmation"
-                  )
-                }
-              }
-            ) %>
-          <% end %>
-        </td>
+        <td><%= link_to artifact.title, artifact_path(artifact) %></td>
+        <td><%= artifact.creator.name %></td>
+        <td><%= artifact.approver&.name || "-" %></td>
+        <td><%= artifact.current_round %></td>
+        <td><%= l artifact.review_deadline, format: :short %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% if @reviewer_artifacts.empty? %>
+  <p><%= t(".empty") %></p>
+<% end %>
+
+<h2><%= t(".approver_title") %></h2>
+
+<table id="approver-artifacts">
+  <thead>
+    <tr>
+      <th><%= Artifact.human_attribute_name(:title) %></th>
+      <th><%= Artifact.human_attribute_name(:creator) %></th>
+      <th><%= Artifact.human_attribute_name(:status) %></th>
+      <th><%= Review.human_attribute_name(:round) %></th>
+      <th><%= Artifact.human_attribute_name(:review_deadline) %></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @approver_artifacts.each do |artifact| %>
+      <tr>
+        <td><%= link_to artifact.title, artifact_path(artifact) %></td>
+        <td><%= artifact.creator.name %></td>
+        <td><%= artifact.status_label %></td>
+        <td><%= artifact.current_round %></td>
+        <td><%= l artifact.review_deadline, format: :short %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if @approver_artifacts.empty? %>
+  <p><%= t(".empty") %></p>
+<% end %>
+
+<h2><%= t(".creator_title") %></h2>
+
+<table id="creator-artifacts">
+  <thead>
+    <tr>
+      <th><%= Artifact.human_attribute_name(:title) %></th>
+      <th><%= t("common.approver") %></th>
+      <th><%= t("common.reviewer") %></th>
+      <th><%= Artifact.human_attribute_name(:status) %></th>
+      <th><%= Review.human_attribute_name(:round) %></th>
+      <th><%= Artifact.human_attribute_name(:review_deadline) %></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @created_artifacts.each do |artifact| %>
+      <tr>
+        <td><%= link_to artifact.title, artifact_path(artifact) %></td>
+        <td><%= artifact.approver&.name || "-" %></td>
+        <td><%= artifact.reviewers.map(&:name).join(", ").presence || "-" %></td>
+        <td><%= artifact.status_label %></td>
+        <td><%= artifact.current_round %></td>
+        <td><%= l artifact.review_deadline, format: :short %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if @created_artifacts.empty? %>
+  <p><%= t(".empty") %></p>
+<% end %>

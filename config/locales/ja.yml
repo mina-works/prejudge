@@ -45,6 +45,10 @@ ja:
   artifacts:
     index:
       title: 成果物一覧
+      reviewer_title: レビュアーとして担当中の成果物
+      approver_title: 承認者として担当中の成果物
+      creator_title: 制作者として未完了の成果物
+      empty: 該当する成果物はありません
     
     show:
       title: 成果物詳細

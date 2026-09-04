@@ -121,12 +121,26 @@ class Artifact < ApplicationRecord
 
   # approverを表示
   def approver
-    artifact_reviewers.approver.first&.user
+    assignment =
+      if artifact_reviewers.loaded?
+        artifact_reviewers.find(&:approver?)
+      else
+        artifact_reviewers.approver.first
+      end
+
+    assignment&.user
   end
 
   # reviewerを表示
   def reviewers
-    artifact_reviewers.reviewer.includes(:user).map(&:user)
+    assignments =
+      if artifact_reviewers.loaded?
+        artifact_reviewers.select(&:reviewer?)
+      else
+        artifact_reviewers.reviewer.includes(:user)
+      end
+
+    assignments.map(&:user)
   end
 
   # 現在ラウンドのレビューを取得する

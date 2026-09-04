@@ -39,4 +39,28 @@ class UserTest < ActiveSupport::TestCase
 
     assert @user.errors[:password_confirmation].present?
   end
+
+  test "Reviewerとしての担当とArtifactを取得できる" do
+    reviewer = users(:reviewer)
+    assignment = artifact_reviewers(:role_reviewer)
+
+    assert_includes reviewer.reviewer_assignments, assignment
+    assert_includes reviewer.reviewer_artifacts, assignment.artifact
+    assert_not_includes reviewer.approver_assignments, assignment
+  end
+
+  test "Approverとしての担当とArtifactを取得できる" do
+    approver = users(:approver)
+    assignment = artifact_reviewers(:role_approver)
+
+    assert_includes approver.approver_assignments, assignment
+    assert_includes approver.approver_artifacts, assignment.artifact
+    assert_not_includes approver.reviewer_assignments, assignment
+  end
+
+  test "既存のartifact_reviewersはUserの削除を制限する" do
+    association = User.reflect_on_association(:artifact_reviewers)
+
+    assert_equal :restrict_with_error, association.options[:dependent]
+  end
 end
