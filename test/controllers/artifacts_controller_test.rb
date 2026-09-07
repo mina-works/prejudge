@@ -11,6 +11,235 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     @update_artifact = artifacts(:update_test_artifact)
   end
 
+  ## index
+  test "Reviewer一覧には担当するレビュー対応中のArtifactだけを表示する" do
+    statuses = {
+      draft: false,
+      pending_review: true,
+      reviewing: true,
+      revision_required: false,
+      reviewed: false
+    }
+
+    artifacts = statuses.to_h do |status, _visible|
+      artifact = create_artifact(
+        title: "Reviewer #{status}",
+        status: status,
+        reviewer: @reviewer,
+        approver: @approver
+      )
+
+      [status, artifact]
+    end
+
+    unrelated = create_artifact(
+      title: "Reviewer unrelated",
+      status: :pending_review,
+      creator: users(:unassigned_user),
+      reviewer: @creator,
+      approver: @approver
+    )
+
+    log_in_as(@reviewer)
+    get artifacts_path
+
+    assert_response :success
+
+    assert_select "#reviewer-artifacts" do
+      statuses.each do |status, visible|
+        assert_select "a[href=?]", artifact_path(artifacts.fetch(status)),
+                      count: visible ? 1 : 0
+      end
+
+      assert_select "a[href=?]", artifact_path(unrelated), count: 0
+    end
+  end
+
+  test "Approver一覧には担当するレビュー完了前のArtifactだけを表示する" do
+    statuses = {
+      draft: false,
+      pending_review: true,
+      reviewing: true,
+      revision_required: true,
+      reviewed: false
+    }
+
+    artifacts = statuses.to_h do |status, _visible|
+      artifact = create_artifact(
+        title: "Approver #{status}",
+        status: status,
+        reviewer: @reviewer,
+        approver: @approver
+      )
+
+      [status, artifact]
+    end
+
+    unrelated = create_artifact(
+      title: "Approver unrelated",
+      status: :pending_review,
+      creator: users(:unassigned_user),
+      reviewer: @reviewer,
+      approver: @creator
+    )
+
+    log_in_as(@approver)
+    get artifacts_path
+
+    assert_response :success
+
+    assert_select "#approver-artifacts" do
+      statuses.each do |status, visible|
+        assert_select "a[href=?]", artifact_path(artifacts.fetch(status)),
+                      count: visible ? 1 : 0
+      end
+
+      assert_select "a[href=?]", artifact_path(unrelated), count: 0
+    end
+  end
+
+  test "Creator一覧には自分が作成した未完了Artifactだけを表示する" do
+    pending_artifact = create_artifact(
+      title: "Creator pending",
+      status: :pending_review
+    )
+    reviewed_artifact = create_artifact(
+      title: "Creator reviewed",
+      status: :reviewed
+    )
+    unrelated = create_artifact(
+      title: "Creator unrelated",
+      status: :pending_review,
+      creator: users(:unassigned_user),
+      reviewer: @creator,
+      approver: @approver
+    )
+
+    log_in_as(@creator)
+    get artifacts_path
+
+    assert_response :success
+
+    assert_select "#creator-artifacts" do
+      assert_select "a[href=?]", artifact_path(pending_artifact), count: 1
+      assert_select "a[href=?]", artifact_path(reviewed_artifact), count: 0
+      assert_select "a[href=?]", artifact_path(unrelated), count: 0
+    end
+  end
+
+  test "各一覧はレビュー期限順かつ同期限では作成日時順に表示する" do
+    current_user = User.create!(
+      name: "Index Order User",
+      email: "index-order@example.com",
+      password: "password",
+      password_confirmation: "password"
+    )
+    same_deadline = 5.days.from_now.change(usec: 0)
+
+    create_artifact(
+      title: "Creator order third",
+      status: :pending_review,
+      creator: current_user,
+      deadline: 1.week.from_now,
+      created_at: 3.days.ago
+    )
+    create_artifact(
+      title: "Creator order second",
+      status: :pending_review,
+      creator: current_user,
+      deadline: same_deadline,
+      created_at: 1.day.ago
+    )
+    create_artifact(
+      title: "Creator order first",
+      status: :pending_review,
+      creator: current_user,
+      deadline: same_deadline,
+      created_at: 2.days.ago
+    )
+    create_artifact(
+      title: "Reviewer order third",
+      status: :pending_review,
+      reviewer: current_user,
+      deadline: 1.week.from_now,
+      created_at: 3.days.ago
+    )
+    create_artifact(
+      title: "Reviewer order second",
+      status: :pending_review,
+      reviewer: current_user,
+      deadline: same_deadline,
+      created_at: 1.day.ago
+    )
+    create_artifact(
+      title: "Reviewer order first",
+      status: :pending_review,
+      reviewer: current_user,
+      deadline: same_deadline,
+      created_at: 2.days.ago
+    )
+    create_artifact(
+      title: "Approver order third",
+      status: :pending_review,
+      approver: current_user,
+      deadline: 1.week.from_now,
+      created_at: 3.days.ago
+    )
+    create_artifact(
+      title: "Approver order second",
+      status: :pending_review,
+      approver: current_user,
+      deadline: same_deadline,
+      created_at: 1.day.ago
+    )
+    create_artifact(
+      title: "Approver order first",
+      status: :pending_review,
+      approver: current_user,
+      deadline: same_deadline,
+      created_at: 2.days.ago
+    )
+
+    log_in_as(current_user)
+    get artifacts_path
+
+    assert_equal [
+      "Reviewer order first",
+      "Reviewer order second",
+      "Reviewer order third"
+    ], css_select("#reviewer-artifacts tbody a").map { |link| link.text.strip }
+
+    assert_equal [
+      "Approver order first",
+      "Approver order second",
+      "Approver order third"
+    ], css_select("#approver-artifacts tbody a").map { |link| link.text.strip }
+
+    assert_equal [
+      "Creator order first",
+      "Creator order second",
+      "Creator order third"
+    ], css_select("#creator-artifacts tbody a").map { |link| link.text.strip }
+  end
+
+  test "対象Artifactが0件でもindexを表示できる" do
+    user = User.create!(
+      name: "Empty Index User",
+      email: "empty-index@example.com",
+      password: "password",
+      password_confirmation: "password"
+    )
+
+    log_in_as(user)
+    get artifacts_path
+
+    assert_response :success
+    assert_select "#reviewer-artifacts tbody tr", count: 0
+    assert_select "#approver-artifacts tbody tr", count: 0
+    assert_select "#creator-artifacts tbody tr", count: 0
+    assert_select "p", text: I18n.t("artifacts.index.empty"), count: 3
+  end
+
   ## create
   ### 正常系
   test "ログインUserはArtifactを作成できる" do
@@ -408,5 +637,29 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to artifact_url(@artifact)
     assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
     assert Artifact.exists?(@artifact.id)
+  end
+
+  private
+
+  def create_artifact(
+    title:,
+    status:,
+    creator: @creator,
+    reviewer: @reviewer,
+    approver: @approver,
+    deadline: 1.week.from_now,
+    created_at: Time.current
+  )
+    artifact = Artifact.new(
+      title: title,
+      creator: creator,
+      status: status,
+      review_deadline: deadline,
+      created_at: created_at,
+      reviewer_ids: [reviewer.id],
+      approver_id: approver.id
+    )
+    artifact.save_with_review_members!
+    artifact
   end
 end

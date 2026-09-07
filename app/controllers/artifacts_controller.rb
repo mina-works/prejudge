@@ -11,18 +11,18 @@ class ArtifactsController < ApplicationController
                 ]
   
   before_action :ensure_creator,
-  only: %i[edit update destroy submit resubmit]
+                only: %i[edit update destroy submit resubmit]
 
   before_action :ensure_editable,
-  only: %i[edit update]
+                only: %i[edit update]
 
   before_action :ensure_resubmittable,
-  only: %i[resubmit]
+                only: %i[resubmit]
 
   before_action :ensure_submittable,
-  only: %i[submit]
+                only: %i[submit]
 
- def index
+  def index
     # Reviewerとして対応可能なArtifactを取得する
     @reviewer_artifacts =
       current_user.reviewer_artifacts
