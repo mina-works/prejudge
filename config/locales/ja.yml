@@ -41,6 +41,7 @@ ja:
     actions: 操作
     show: 詳細
     file: 成果物ファイル
+    logout: ログアウト
 
   artifacts:
     index:

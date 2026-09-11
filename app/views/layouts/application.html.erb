@@ -11,6 +11,14 @@
   </head>
 
   <body>
+    <% if current_user.present? %>
+      <header>
+        <%= button_to t("common.logout"),
+                      session_path,
+                      method: :delete %>
+      </header>
+    <% end %>
+
     <% flash.each do |type, message| %>
       <p><%= message %></p>
     <% end %>
