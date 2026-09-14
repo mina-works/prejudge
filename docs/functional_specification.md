@@ -10,10 +10,15 @@
 - approver 必須
 - ReviewerとApproverには、同じユーザーを選択できない
 - CreatorはReviewer・Approverになれない
+- ReviewCondition 必須
+  - purpose 必須
+  - target 必須
+  - tone 必須
 
 ### 成功時
 - Artifactが保存される
 - Artifactにapprover・reviewerとして選択したUserを保存できる
+- ArtifactにReviewConditionが保存される
 - 成果物が作成された旨のflashメッセージが表示される
 - Artifact詳細ページに遷移する
 - ステータスがdraftになる
@@ -81,6 +86,8 @@
 
 ### 実行条件
 - ファイルが添付されている
+- ReviewConditionが登録されている
+- ReviewConditionのpurpose・target・toneが有効
 
 ### 成功時
 - 成果物が提出された旨のflashメッセージが表示される
@@ -116,6 +123,11 @@
 ### 実行できる状態
 - revision_required
 
+### 実行条件
+- ファイルが添付されている
+- ReviewConditionが登録されている
+- ReviewConditionのpurpose・target・toneが有効
+
 ### 成功時
 - 成果物が再提出された旨のflashメッセージが表示される
 - Artifact詳細ページに遷移する
@@ -123,6 +135,11 @@
 - roundが1増える
 
 ### 失敗時
+#### Creator + revision_required + 実行条件が満たされていない
+→ バリデーションによる再提出失敗
+- 入力内容に応じたエラーメッセージが表示される
+- Artifact詳細画面が表示される
+
 #### Reviewer + revision_required
 → 認可による操作拒否
 - Creatorだけが再提出できるエラーメッセージが表示される
@@ -205,3 +222,41 @@ Artifact作成
 #### Reviewer全員とApproverのReviewが完了した場合
 - Approverがok → reviewed
 - Approverがuneasyまたはng → revision_required
+
+---
+## ReviewCondition
+
+### 設定するUser
+- ArtifactのCreator
+
+### 登録タイミング
+- Artifact作成時に登録する
+
+### 必須項目
+- purpose
+- target
+- tone
+
+### Artifactとの関係
+- 1つのArtifactにつき1つのReviewConditionを持つ
+
+### 表示
+- Artifact詳細画面に表示する
+- Creator・Reviewer・Approverがレビュー条件を確認するために使用する
+
+### ステータスごとのReviewConditionの変更可否
+
+#### draft
+変更できる
+
+#### pending_review
+変更できない
+
+#### reviewing
+変更できない
+
+#### revision_required
+変更できる
+
+#### reviewed
+変更できない
