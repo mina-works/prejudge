@@ -10,6 +10,8 @@ class Artifact < ApplicationRecord
 
   attr_writer :reviewer_ids, :approver_id
 
+  accepts_nested_attributes_for :review_condition
+
   
   enum status: {
     draft: 0,
@@ -29,6 +31,7 @@ class Artifact < ApplicationRecord
   validate :approver_must_be_selected
   validate :reviewer_and_approver_must_be_different
   validate :creator_cannot_be_review_member
+  validates :review_condition, presence: true
 
 
   # フォームから渡されたReviewer IDを返す。
@@ -70,14 +73,7 @@ class Artifact < ApplicationRecord
   # 成果物をレビュー依頼する
   # 提出時にはファイル必須
   def submit!
-    unless file.attached?
-      errors.add(
-        :file,
-        I18n.t("errors.artifact.file_required")
-      )
-
-      raise ActiveRecord::RecordInvalid.new(self)
-    end
+    ensure_file_attached!
 
     unless submittable?
       errors.add(
@@ -98,6 +94,17 @@ class Artifact < ApplicationRecord
 
   # 成果物を再提出する
   def resubmit!
+    ensure_file_attached!
+
+    unless resubmittable?
+      errors.add(
+        :base,
+        I18n.t("errors.artifact.not_resubmittable")
+      )
+
+      raise ActiveRecord::RecordInvalid.new(self)
+    end
+
     self.current_round += 1
     self.status = :pending_review
 
@@ -290,5 +297,17 @@ class Artifact < ApplicationRecord
 
     errors.add(:base, I18n.t("errors.artifact.cannot_delete"))
     throw(:abort)
+  end
+
+  # 提出・再提出に必要なファイルが添付されていることを確認する
+  def ensure_file_attached!
+    return if file.attached?
+
+    errors.add(
+      :file,
+      I18n.t("errors.artifact.file_required")
+    )
+
+    raise ActiveRecord::RecordInvalid.new(self)
   end
 end

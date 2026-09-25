@@ -5,6 +5,25 @@
   <%= @artifact.id %>
 </p>
 
+<h2><%= t("common.review_condition") %></h2>
+
+<p>
+  <%= ReviewCondition.human_attribute_name(:purpose) %> :
+  <%= @artifact.review_condition.purpose %>
+</p>
+
+<p>
+  <%= ReviewCondition.human_attribute_name(:target) %> :
+  <%= @artifact.review_condition.target_label %>
+</p>
+
+<p>
+  <%= ReviewCondition.human_attribute_name(:tone) %> :
+  <%= @artifact.review_condition.tone_label %>
+</p>
+
+<h2><%= t("common.artifact") %></h2>
+
 <p>
   <%= Artifact.human_attribute_name(:title) %> :
   <%= @artifact.title %>

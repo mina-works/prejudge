@@ -24,6 +24,11 @@ ja:
       session:
         email: メールアドレス
 
+      review_condition:
+        purpose: 目的
+        target: 対象
+        tone: トーン
+
   time:
     formats:
       short: "%Y/%m/%d"
@@ -42,6 +47,8 @@ ja:
     show: 詳細
     file: 成果物ファイル
     logout: ログアウト
+    review_condition: レビュー条件
+    artifact: 成果物
 
   artifacts:
     index:
@@ -129,6 +136,25 @@ ja:
         tone_mismatch: トーンが合っていない
         too_much_or_little_info: 情報量の過不足
         direction_issue: 方向性に問題がある
+
+    review_condition:
+      target:
+        students: 学生
+        job_seekers: 求職者
+        local_government_staff: 自治体職員
+        companies: 企業
+        clients: 顧客
+        residents: 地域住民
+        internal_members: 社内メンバー
+
+      tone:
+        serious: シリアス
+        friendly: フレンドリー
+        warm: あたたかい
+        professional: プロフェッショナル
+        modern: モダン
+        casual: カジュアル
+        luxurious: ラグジュアリー
 
   flash:
     review:

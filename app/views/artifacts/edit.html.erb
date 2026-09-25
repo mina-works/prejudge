@@ -6,8 +6,34 @@
 
 
 <%= form_with model: @artifact do |form| %>
+  <%= form.fields_for :review_condition do |condition_form| %>
+    <h2><%= t("common.review_condition") %></h2>
 
-  <%= form.hidden_field :creator_id, value: User.last.id %>
+    <div>
+      <%= condition_form.label :purpose %>
+      <%= condition_form.text_field :purpose %>
+    </div>
+
+    <div>
+      <%= condition_form.label :target %>
+
+      <%= condition_form.select :target,
+        ReviewCondition.targets.keys.map { |target|
+          [ReviewCondition.target_label(target), target]
+        } %>
+    </div>
+
+    <div>
+      <%= condition_form.label :tone %>
+
+      <%= condition_form.select :tone,
+        ReviewCondition.tones.keys.map{ |tone|
+          [ReviewCondition.tone_label(tone), tone]
+        } %>
+    </div>
+  <% end %>
+
+  <h2><%= t("common.artifact") %></h2>
 
   <div>
     <%= form.label :title %>

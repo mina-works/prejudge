@@ -53,6 +53,7 @@ class ArtifactsController < ApplicationController
   def new
     @artifact = Artifact.new
     @users = User.all
+    @artifact.build_review_condition
   end
 
   def create
@@ -154,7 +155,13 @@ class ArtifactsController < ApplicationController
       :review_deadline,
       :approver_id,
       :file,
-      reviewer_ids: []
+      reviewer_ids: [],
+      review_condition_attributes:[
+        :id,
+        :purpose,
+        :target,
+        :tone
+      ]
     )
   end
 
