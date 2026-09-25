@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_05_074225) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_24_062657) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -69,7 +69,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_05_074225) do
     t.integer "tone", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["artifact_id"], name: "index_review_conditions_on_artifact_id"
+    t.index ["artifact_id"], name: "index_review_conditions_on_artifact_id", unique: true
   end
 
   create_table "review_issues", force: :cascade do |t|
