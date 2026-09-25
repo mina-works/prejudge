@@ -7,6 +7,7 @@ class ArtifactTest < ActiveSupport::TestCase
 
     assert_not artifact.valid?
     assert_includes artifact.errors[:review_condition], I18n.t("errors.messages.blank")
+    assert_includes artifact.errors.full_messages, "レビュー条件を入力してください"
   end
 
   test "draftのArtifactは削除できる" do

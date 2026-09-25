@@ -20,6 +20,7 @@ ja:
         user: ユーザー
 
       review:
+        artifact: 成果物
         result: 判定結果
         round: レビュー回
         comment: コメント
@@ -30,6 +31,7 @@ ja:
         email: メールアドレス
 
       review_condition:
+        artifact: 成果物
         purpose: 目的
         target: 対象
         tone: トーン
@@ -70,7 +72,7 @@ ja:
       submit: 提出
       destroy: 削除
       destroy_confirm: この成果物を削除しますか？
-      cannot_delete_description: レビュー依頼後またはレビュー完了後の成果物は削除できません。
+      cannot_delete_description: 下書き状態の成果物だけ削除できます。
     
     new:
       title: 成果物登録
@@ -94,6 +96,8 @@ ja:
       login: ログイン
 
   errors:
+    format: "%{attribute}%{message}"
+
     messages:
       blank: を入力してください
       required: を選択してください
@@ -105,16 +109,16 @@ ja:
       not_submittable: 提出できません
       approver_required: を選択してください
       review_roles_must_be_separate: レビュアーと承認者には別のユーザーを指定してください
-      creator_cannot_be_reviewer: 作成者をレビュアーに指定することはできません
-      creator_cannot_be_approver: 作成者を承認者に指定することはできません
-      cannot_delete: レビュー依頼中またはレビュー完了後の成果物は削除できません。
+      creator_cannot_be_reviewer: 制作者をレビュアーに指定することはできません
+      creator_cannot_be_approver: 制作者を承認者に指定することはできません
+      cannot_delete: 下書き状態の成果物だけ削除できます
       file_required: を添付してください
 
     review:
       prevent_edit_past_review: 過去ラウンドのレビューは編集できません
-      reviewer_cannot_select_ng: レビュアーはNGを選択できません
+      reviewer_cannot_select_ng: では、レビュアーはNGを選択できません
       user_must_be_review_member: はこの成果物のレビュー担当者ではありません
-      artifact_must_be_reviewable: レビュー依頼後の成果物は削除できません。
+      artifact_must_be_reviewable: はレビュー待ちまたはレビュー中の場合のみレビューできます
 
     review_issue:
       review_is_ok: OKを選択したレビューには違和感を登録できません
@@ -173,8 +177,8 @@ ja:
       not_editable: この成果物は現在編集できません
       not_resubmittable: この成果物は再提出できません
       not_submittable: この成果物は提出できません
-      destroyed: 成果物を削除しました。
-      not_authorized: Creatorだけが操作できます
+      destroyed: 成果物を削除しました
+      not_authorized: 制作者だけが操作できます
 
     session: 
       created: ログインしました

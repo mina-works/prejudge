@@ -152,4 +152,18 @@ class ReviewTest < ActiveSupport::TestCase
     # 同じトランザクション内なのでDB上の変更は元に戻る
     assert_predicate @artifact.reload, :pending_review?
   end
+
+  test "レビューできない状態のエラーを内容に合った日本語で表示する" do
+    @artifact.status = :draft
+    review = @artifact.reviews.build(
+      user: @reviewer,
+      result: :ok
+    )
+
+    assert_not review.valid?
+    assert_includes(
+      review.errors.full_messages,
+      "成果物はレビュー待ちまたはレビュー中の場合のみレビューできます"
+    )
+  end
 end
