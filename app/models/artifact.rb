@@ -74,6 +74,7 @@ class Artifact < ApplicationRecord
   # 提出時にはファイル必須
   def submit!
     ensure_file_attached!
+    ensure_review_condition_valid!
 
     unless submittable?
       errors.add(
@@ -95,6 +96,7 @@ class Artifact < ApplicationRecord
   # 成果物を再提出する
   def resubmit!
     ensure_file_attached!
+    ensure_review_condition_valid!
 
     unless resubmittable?
       errors.add(
@@ -307,6 +309,24 @@ class Artifact < ApplicationRecord
       :file,
       I18n.t("errors.artifact.file_required")
     )
+
+    raise ActiveRecord::RecordInvalid.new(self)
+  end
+
+  # 提出・再提出に必要なレビュー条件が有効であることを確認する
+  def ensure_review_condition_valid!
+    if review_condition.nil?
+      errors.add(:review_condition, :blank)
+    elsif review_condition.invalid?
+      review_condition.errors.each do |error|
+        errors.import(
+          error,
+          attribute: :"review_condition.#{error.attribute}"
+        )
+      end
+    else
+      return
+    end
 
     raise ActiveRecord::RecordInvalid.new(self)
   end

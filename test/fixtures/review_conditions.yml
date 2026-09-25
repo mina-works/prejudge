@@ -1,11 +1,35 @@
-one:
-  artifact: review_test_artifact
-  purpose: MyText
+pending_review_condition:
+  artifact: pending_review_artifact
+  purpose: レビュー目的
   target: 1
   tone: 1
 
-two:
+review_test_condition:
   artifact: review_test_artifact
-  purpose: MyText
+  purpose: レビュー目的
+  target: 1
+  tone: 1
+
+draft_condition:
+  artifact: draft_artifact
+  purpose: レビュー目的
+  target: 1
+  tone: 1
+
+review_create_test_condition:
+  artifact: review_create_test_artifact
+  purpose: レビュー目的
+  target: 1
+  tone: 1
+
+update_test_condition:
+  artifact: update_test_artifact
+  purpose: レビュー目的
+  target: 1
+  tone: 1
+
+revision_required_condition:
+  artifact: revision_required_artifact
+  purpose: レビュー目的
   target: 1
   tone: 1

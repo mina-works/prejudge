@@ -1,5 +1,9 @@
 ja:
   activerecord:
+    models:
+      artifact: 成果物
+      review_condition: レビュー条件
+
     attributes:
       artifact:
         title: タイトル
@@ -10,6 +14,7 @@ ja:
         created_at: 作成日
         approver_id: 承認者
         file: 成果物ファイル
+        review_condition: レビュー条件
 
       artifact_reviewer:
         user: ユーザー

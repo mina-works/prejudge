@@ -17,7 +17,12 @@ class ReviewTest < ActiveSupport::TestCase
       current_round: 1,
       review_deadline: 1.week.from_now,
       reviewer_ids: [@reviewer.id],
-      approver_id: @approver.id
+      approver_id: @approver.id,
+      review_condition_attributes: {
+        purpose: "レビュー目的",
+        target: :job_seekers,
+        tone: :friendly
+      }
     )
 
     @artifact.save_with_review_members!

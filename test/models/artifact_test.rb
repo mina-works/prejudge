@@ -1,6 +1,14 @@
 require "test_helper"
 
 class ArtifactTest < ActiveSupport::TestCase
+  test "ReviewConditionがないArtifactはinvalid" do
+    artifact = artifacts(:draft_artifact)
+    artifact.review_condition = nil
+
+    assert_not artifact.valid?
+    assert_includes artifact.errors[:review_condition], I18n.t("errors.messages.blank")
+  end
+
   test "draftのArtifactは削除できる" do
     # fixturesからテスト用のArtifactを取得する
     artifact = artifacts(:draft_artifact)
