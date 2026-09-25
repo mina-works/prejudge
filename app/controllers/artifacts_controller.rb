@@ -157,6 +157,7 @@ class ArtifactsController < ApplicationController
       :file,
       reviewer_ids: [],
       review_condition_attributes:[
+        :id,
         :purpose,
         :target,
         :tone
