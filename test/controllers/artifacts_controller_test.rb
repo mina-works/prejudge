@@ -246,15 +246,12 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     # ログイン中のUserをCreatorとして使う
     log_in_as(@creator)
 
-    assert_difference("Artifact.count", 1) do
+    assert_difference(["Artifact.count", "ReviewCondition.count"], 1) do
       post artifacts_path, params: {
-        artifact: {
+        artifact: valid_artifact_params(
           title: "New Artifact",
-          description: "新しい成果物です",
-          review_deadline: 1.week.from_now,
-          approver_id: @approver.id,
-          reviewer_ids: [@reviewer.id]
-        }
+          description: "新しい成果物です"
+        )
       }
     end
 
@@ -269,6 +266,10 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     # ログインUserがCreatorとして保存される
     assert_equal @creator, created_artifact.creator
+
+    assert_equal "採用ページの改善", created_artifact.review_condition.purpose
+    assert_predicate created_artifact.review_condition, :job_seekers?
+    assert_predicate created_artifact.review_condition, :friendly?
 
     # Reviewerが保存されていることを確認する
     assert_equal(
@@ -297,13 +298,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     assert_no_difference("Artifact.count") do
       post artifacts_path, params: {
-        artifact: {
-          title: "",
-          description: "新しい成果物です",
-          review_deadline: 1.week.from_now,
-          approver_id: @approver.id,
-          reviewer_ids: [@reviewer.id]
-        }
+        artifact: valid_artifact_params(title: "")
       }
     end
 
@@ -311,18 +306,27 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "ReviewConditionが不正な場合はArtifactもReviewConditionも作成できない" do
+    log_in_as(@creator)
+
+    params = valid_artifact_params
+    params[:review_condition_attributes][:purpose] = ""
+
+    assert_no_difference(["Artifact.count", "ReviewCondition.count"]) do
+      post artifacts_path, params: { artifact: params }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "h1", text: I18n.t("artifacts.new.title")
+    assert_no_match(/Review condition/i, response.body)
+  end
+
   ### 未ログイン
   test "未ログインではcreateできない" do
 
     assert_no_difference("Artifact.count") do
       post artifacts_path, params: {
-        artifact: {
-          title: "New Artifact",
-          description: "新しい成果物です",
-          review_deadline: 1.week.from_now,
-          approver_id: @approver.id,
-          reviewer_ids: [@reviewer.id]
-        }
+        artifact: valid_artifact_params(title: "New Artifact")
       }
     end
 
@@ -358,20 +362,55 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   test "Creatorは自分のArtifactを更新できる" do
     log_in_as(@creator)
 
-    patch artifact_path(@update_artifact), params: {
-      artifact: {
-        title: "更新後のタイトル",
-        description: @update_artifact.description,
-        review_deadline: @update_artifact.review_deadline,
-        approver_id: @update_artifact.approver_id,
-        reviewer_ids: @update_artifact.reviewer_ids
+    review_condition = @update_artifact.review_condition
+
+    assert_no_difference("ReviewCondition.count") do
+      patch artifact_path(@update_artifact), params: {
+        artifact: update_params(
+          @update_artifact,
+          title: "更新後のタイトル",
+          review_condition_attributes: {
+            id: review_condition.id,
+            purpose: "更新後の目的",
+            target: :companies,
+            tone: :professional
+          }
+        )
       }
-    }
+    end
 
     assert_redirected_to artifact_path(@update_artifact)
+    assert_equal I18n.t("flash.artifact.updated"), flash[:notice]
 
     @update_artifact.reload
     assert_equal "更新後のタイトル", @update_artifact.title
+    assert_equal review_condition.id, @update_artifact.review_condition.id
+    assert_equal "更新後の目的", @update_artifact.review_condition.purpose
+    assert_predicate @update_artifact.review_condition, :companies?
+    assert_predicate @update_artifact.review_condition, :professional?
+  end
+
+  test "Creatorはrevision_requiredのArtifactとReviewConditionを更新できる" do
+    log_in_as(@creator)
+
+    patch artifact_path(@revision_required_artifact), params: {
+      artifact: update_params(
+        @revision_required_artifact,
+        title: "再提出前の更新",
+        review_condition_attributes: {
+          id: @revision_required_artifact.review_condition.id,
+          purpose: "再提出時の目的",
+          target: :clients,
+          tone: :warm
+        }
+      )
+    }
+
+    assert_redirected_to artifact_path(@revision_required_artifact)
+
+    @revision_required_artifact.reload
+    assert_equal "再提出前の更新", @revision_required_artifact.title
+    assert_equal "再提出時の目的", @revision_required_artifact.review_condition.purpose
   end
 
   ### バリデーション
@@ -382,13 +421,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     original_title = @artifact.title
 
     patch artifact_path(@artifact), params: {
-      artifact: {
-        title: "",
-        description: "新しい成果物です",
-        review_deadline: 1.week.from_now,
-        approver_id: @approver.id,
-        reviewer_ids: [@reviewer.id]
-      }
+      artifact: update_params(@artifact, title: "")
     }
 
     # バリデーションエラー時は422を返す
@@ -398,52 +431,89 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_title, @artifact.title
   end
 
+  test "ReviewConditionが不正な場合はArtifactもReviewConditionも更新されない" do
+    log_in_as(@creator)
+
+    original_title = @update_artifact.title
+    original_purpose = @update_artifact.review_condition.purpose
+
+    patch artifact_path(@update_artifact), params: {
+      artifact: update_params(
+        @update_artifact,
+        title: "保存されないタイトル",
+        review_condition_attributes: {
+          id: @update_artifact.review_condition.id,
+          purpose: "",
+          target: :companies,
+          tone: :professional
+        }
+      )
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "h1", text: I18n.t("artifacts.edit.title")
+
+    @update_artifact.reload
+    assert_equal original_title, @update_artifact.title
+    assert_equal original_purpose, @update_artifact.review_condition.purpose
+  end
+
   ### 認可
   test "Creator以外はArtifactを更新できない" do
     log_in_as(@reviewer)
 
     original_title = @artifact.title
+    original_purpose = @artifact.review_condition.purpose
 
     patch artifact_path(@artifact), params: {
-      artifact: {
+      artifact: update_params(
+        @artifact,
         title: "変更されたタイトル",
-        description: @artifact.description,
-        review_deadline: @artifact.review_deadline,
-        approver_id: @artifact.approver_id,
-        reviewer_ids: @artifact.reviewer_ids
-      }
+        review_condition_attributes: {
+          id: @artifact.review_condition.id,
+          purpose: "変更された目的",
+          target: :companies,
+          tone: :professional
+        }
+      )
     }
 
     assert_redirected_to artifact_path(@artifact)
 
     @artifact.reload
     assert_equal original_title, @artifact.title
+    assert_equal original_purpose, @artifact.review_condition.purpose
   end
 
   ### 状態
-  test "pending_reviewのArtifactは更新できない" do
+  test "編集不可状態のArtifactとReviewConditionは更新できない" do
     log_in_as(@creator)
 
-    original_title = @pending_review_artifact.title
+    %i[pending_review reviewing reviewed].each do |status|
+      @pending_review_artifact.update_column(:status, Artifact.statuses.fetch(status))
+      original_title = @pending_review_artifact.title
+      original_purpose = @pending_review_artifact.review_condition.purpose
 
-    patch artifact_path(@pending_review_artifact), params: {
-      artifact: {
-        title: "不正に変更されたタイトル",
-        description: @pending_review_artifact.description,
-        review_deadline: @pending_review_artifact.review_deadline,
-        approver_id: @pending_review_artifact.approver_id,
-        reviewer_ids: @pending_review_artifact.reviewer_ids
+      patch artifact_path(@pending_review_artifact), params: {
+        artifact: update_params(
+          @pending_review_artifact,
+          title: "不正に変更されたタイトル",
+          review_condition_attributes: {
+            id: @pending_review_artifact.review_condition.id,
+            purpose: "不正に変更された目的",
+            target: :companies,
+            tone: :professional
+          }
+        )
       }
-    }
 
-    # Artifact詳細画面が表示される
-    assert_redirected_to artifact_path(@pending_review_artifact)
+      assert_redirected_to artifact_path(@pending_review_artifact)
+      assert_equal I18n.t("flash.artifact.not_editable"), flash[:alert]
 
-    # 状態不適合を知らせるメッセージが設定される
-    assert flash[:alert].present?
-
-    @pending_review_artifact.reload
-    assert_equal original_title, @pending_review_artifact.title
+      @pending_review_artifact.reload
+      assert_equal original_title, @pending_review_artifact.title
+      assert_equal original_purpose, @pending_review_artifact.review_condition.purpose
+    end
   end
 
   ## 提出
@@ -453,13 +523,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     log_in_as(@creator)
 
     # 提出条件を満たすため、テスト用ファイルを添付する
-    @artifact.file.attach(
-      io: File.open(
-        Rails.root.join("test/fixtures/files/sample.txt")
-      ),
-      filename: "sample.txt",
-      content_type: "text/plain"
-    )
+    attach_file(@artifact)
     @artifact.reload
 
     # ファイルが添付されたことを確認する
@@ -500,18 +564,28 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_status, @artifact.reload.status
   end
 
+  test "ReviewConditionが不正な場合はファイルがあっても提出できない" do
+    log_in_as(@creator)
+    attach_file(@artifact)
+    @artifact.review_condition.update_column(:purpose, "")
+
+    original_status = @artifact.status
+
+    patch submit_artifact_path(@artifact)
+
+    assert_redirected_to artifact_path(@artifact)
+    assert_predicate flash[:alert], :present?
+    assert_includes flash[:alert], "目的"
+    assert_no_match(/Review condition/i, flash[:alert])
+    assert_equal original_status, @artifact.reload.status
+  end
+
   ### 認可
   test "Creator以外はdraftのArtifactを提出できない" do
     log_in_as(@reviewer)
 
     # 認可以外の提出条件を満たすため、テスト用ファイルを添付する
-    @artifact.file.attach(
-      io: File.open(
-        Rails.root.join("test/fixtures/files/sample.txt")
-      ),
-      filename: "sample.txt",
-      content_type: "text/plain"
-    )
+    attach_file(@artifact)
 
     original_status = @artifact.status
 
@@ -523,22 +597,25 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   ### 状態
-  test "pending_reviewのArtifactは提出できない" do
+  test "draft以外のArtifactは提出できない" do
     log_in_as(@creator)
 
-    original_status = @pending_review_artifact.status
+    %i[pending_review reviewing revision_required reviewed].each do |status|
+      @pending_review_artifact.update_column(:status, Artifact.statuses.fetch(status))
 
-    patch submit_artifact_path(@pending_review_artifact)
+      patch submit_artifact_path(@pending_review_artifact)
 
-    assert_redirected_to artifact_path(@pending_review_artifact)
-    assert_equal I18n.t("flash.artifact.not_submittable"), flash[:alert]
-    assert_equal original_status, @pending_review_artifact.reload.status
+      assert_redirected_to artifact_path(@pending_review_artifact)
+      assert_equal I18n.t("flash.artifact.not_submittable"), flash[:alert]
+      assert_equal status.to_s, @pending_review_artifact.reload.status
+    end
   end
 
   ## 再提出
   ### 正常系
   test "Creatorはrevision_requiredのArtifactを再提出できる" do
     log_in_as(@creator)
+    attach_file(@revision_required_artifact)
 
     original_round = @revision_required_artifact.current_round
 
@@ -550,6 +627,43 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     @revision_required_artifact.reload
     assert_predicate @revision_required_artifact, :pending_review?
     assert_equal original_round + 1, @revision_required_artifact.current_round
+  end
+
+  ### バリデーション
+  test "ファイルがないとArtifactを再提出できない" do
+    log_in_as(@creator)
+
+    original_status = @revision_required_artifact.status
+    original_round = @revision_required_artifact.current_round
+
+    patch resubmit_artifact_path(@revision_required_artifact)
+
+    assert_redirected_to artifact_path(@revision_required_artifact)
+    assert_predicate flash[:alert], :present?
+
+    @revision_required_artifact.reload
+    assert_equal original_status, @revision_required_artifact.status
+    assert_equal original_round, @revision_required_artifact.current_round
+  end
+
+  test "ReviewConditionが不正な場合はファイルがあっても再提出できない" do
+    log_in_as(@creator)
+    attach_file(@revision_required_artifact)
+    @revision_required_artifact.review_condition.update_column(:tone, 99)
+
+    original_status = @revision_required_artifact.status
+    original_round = @revision_required_artifact.current_round
+
+    patch resubmit_artifact_path(@revision_required_artifact)
+
+    assert_redirected_to artifact_path(@revision_required_artifact)
+    assert_predicate flash[:alert], :present?
+    assert_includes flash[:alert], "トーン"
+    assert_no_match(/Review condition/i, flash[:alert])
+
+    @revision_required_artifact.reload
+    assert_equal original_status, @revision_required_artifact.status
+    assert_equal original_round, @revision_required_artifact.current_round
   end
 
   ### 認可
@@ -570,20 +684,24 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   ### 状態
-  test "draftのArtifactは再提出できない" do
+  test "revision_required以外のArtifactは再提出できない" do
     log_in_as(@creator)
 
-    original_status = @artifact.status
-    original_round = @artifact.current_round
+    %i[draft pending_review reviewing reviewed].each do |status|
+      @artifact.update_columns(
+        status: Artifact.statuses.fetch(status),
+        current_round: 1
+      )
 
-    patch resubmit_artifact_path(@artifact)
+      patch resubmit_artifact_path(@artifact)
 
-    assert_redirected_to artifact_path(@artifact)
-    assert_equal I18n.t("flash.artifact.not_resubmittable"), flash[:alert]
+      assert_redirected_to artifact_path(@artifact)
+      assert_equal I18n.t("flash.artifact.not_resubmittable"), flash[:alert]
 
-    @artifact.reload
-    assert_equal original_status, @artifact.status
-    assert_equal original_round, @artifact.current_round
+      @artifact.reload
+      assert_equal status.to_s, @artifact.status
+      assert_equal 1, @artifact.current_round
+    end
   end
 
   ## destroy
@@ -641,6 +759,51 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
+  def valid_artifact_params(title: "New Artifact", description: "新しい成果物です")
+    {
+      title: title,
+      description: description,
+      review_deadline: 1.week.from_now,
+      approver_id: @approver.id,
+      reviewer_ids: [@reviewer.id],
+      review_condition_attributes: {
+        purpose: "採用ページの改善",
+        target: :job_seekers,
+        tone: :friendly
+      }
+    }
+  end
+
+  def update_params(
+    artifact,
+    title: artifact.title,
+    review_condition_attributes: {
+      id: artifact.review_condition.id,
+      purpose: artifact.review_condition.purpose,
+      target: artifact.review_condition.target,
+      tone: artifact.review_condition.tone
+    }
+  )
+    {
+      title: title,
+      description: artifact.description,
+      review_deadline: artifact.review_deadline,
+      approver_id: artifact.approver_id,
+      reviewer_ids: artifact.reviewer_ids,
+      review_condition_attributes: review_condition_attributes
+    }
+  end
+
+  def attach_file(artifact)
+    file_fixture("sample.txt").open do |file|
+      artifact.file.attach(
+        io: file,
+        filename: "sample.txt",
+        content_type: "text/plain"
+      )
+    end
+  end
+
   def create_artifact(
     title:,
     status:,
@@ -657,7 +820,12 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
       review_deadline: deadline,
       created_at: created_at,
       reviewer_ids: [reviewer.id],
-      approver_id: approver.id
+      approver_id: approver.id,
+      review_condition_attributes: {
+        purpose: "レビュー目的",
+        target: :job_seekers,
+        tone: :friendly
+      }
     )
     artifact.save_with_review_members!
     artifact
