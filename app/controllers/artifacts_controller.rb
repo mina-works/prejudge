@@ -145,13 +145,6 @@ class ArtifactsController < ApplicationController
       alert: e.record.errors.full_messages.join(", ")
   end
 
-  def ensure_viewable
-    return if @artifact.viewable_by?(current_user)
-
-    redirect_to artifacts_path,
-                alert: t("flash.artifact.ensure_viewable")
-  end
-
   private
 
   def set_artifact
@@ -202,5 +195,12 @@ class ArtifactsController < ApplicationController
 
     redirect_to @artifact,
       alert: t("flash.artifact.not_submittable")
+  end
+
+  def ensure_viewable
+    return if @artifact.viewable_by?(current_user)
+
+    redirect_to artifacts_path,
+                alert: t("flash.artifact.ensure_viewable")
   end
 end
