@@ -179,6 +179,7 @@ ja:
       not_submittable: この成果物は提出できません
       destroyed: 成果物を削除しました
       not_authorized: 制作者だけが操作できます
+      ensure_viewable: 閲覧許可がありません
 
     session: 
       created: ログインしました

@@ -22,6 +22,9 @@ class ArtifactsController < ApplicationController
   before_action :ensure_submittable,
                 only: %i[submit]
 
+  before_action :ensure_viewable,
+                only: %i[show]
+
   def index
     # Reviewerとして対応可能なArtifactを取得する
     @reviewer_artifacts =
@@ -140,6 +143,13 @@ class ArtifactsController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     redirect_to @artifact,
       alert: e.record.errors.full_messages.join(", ")
+  end
+
+  def ensure_viewable
+    return if @artifact.viewable_by?(current_user)
+
+    redirect_to artifacts_path,
+                alert: t("flash.artifact.ensure_viewable")
   end
 
   private
