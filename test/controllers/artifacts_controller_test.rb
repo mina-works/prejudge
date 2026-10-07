@@ -240,6 +240,43 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "p", text: I18n.t("artifacts.index.empty"), count: 3
   end
 
+  ## show
+  test "CreatorはArtifact詳細画面を閲覧できる" do
+    log_in_as(@creator)
+
+    get artifact_path(@artifact)
+
+    assert_response :success
+  end
+
+  test "ReviewerはArtifact詳細画面を閲覧できる" do
+    log_in_as(@reviewer)
+
+    get artifact_path(@artifact)
+
+    assert_response :success
+  end
+
+  test "ApproverはArtifact詳細画面を閲覧できる" do
+    log_in_as(@approver)
+
+    get artifact_path(@artifact)
+
+    assert_response :success
+  end
+
+  test "関係のないUserはArtifact詳細画面を閲覧できない" do
+    log_in_as(users(:unassigned_user))
+
+    get artifact_path(@artifact)
+
+    assert_redirected_to artifacts_path
+    assert_equal I18n.t("flash.artifact.ensure_viewable"), flash[:alert]
+
+    follow_redirect!
+    assert_select "p", text: "閲覧許可がありません"
+  end
+
   ## create
   ### 正常系
   test "ログインUserはArtifactを作成できる" do

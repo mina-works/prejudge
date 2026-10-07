@@ -214,6 +214,13 @@ class Artifact < ApplicationRecord
     end
   end
 
+  # artifactのcreator・reviewer・approver以外は閲覧不可
+  def viewable_by?(user)
+    creator == user ||
+      reviewer_ids.map(&:to_s).include?(user.id.to_s) ||
+      approver_id.to_s == user.id.to_s
+  end
+
   private
 
   # Reviewer・Approverを登録し直す

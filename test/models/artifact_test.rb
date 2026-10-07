@@ -1,6 +1,30 @@
 require "test_helper"
 
 class ArtifactTest < ActiveSupport::TestCase
+  test "CreatorはArtifactを閲覧できる" do
+    artifact = artifacts(:draft_artifact)
+
+    assert artifact.viewable_by?(users(:creator))
+  end
+
+  test "ReviewerはArtifactを閲覧できる" do
+    artifact = artifacts(:draft_artifact)
+
+    assert artifact.viewable_by?(users(:reviewer))
+  end
+
+  test "ApproverはArtifactを閲覧できる" do
+    artifact = artifacts(:draft_artifact)
+
+    assert artifact.viewable_by?(users(:approver))
+  end
+
+  test "関係のないUserはArtifactを閲覧できない" do
+    artifact = artifacts(:draft_artifact)
+
+    assert_not artifact.viewable_by?(users(:unassigned_user))
+  end
+
   test "ReviewConditionがないArtifactはinvalid" do
     artifact = artifacts(:draft_artifact)
     artifact.review_condition = nil
