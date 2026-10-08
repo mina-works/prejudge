@@ -10,7 +10,7 @@ class ApplicationLayoutTest < ActionDispatch::IntegrationTest
     get artifacts_path
 
     assert_response :success
-    assert_select "form[action=?][method=post]", session_path do
+    assert_select "header form[action=?][method=post]", session_path, count: 1 do
       assert_select "input[name=_method][value=delete]", count: 1
       assert_select "button", text: I18n.t("common.logout"), count: 1
     end
