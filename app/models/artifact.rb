@@ -221,6 +221,21 @@ class Artifact < ApplicationRecord
       approver_id.to_s == user.id.to_s
   end
 
+  # 指定されたUserが、このArtifactのReviewerまたはApproverか判定する
+  def review_member?(user)
+    return false if user.nil?
+
+    artifact_reviewers.exists?(user_id: user.id)
+  end
+
+  # 指定されたUserが、現在のラウンドでレビュー作成可能か判定する
+  def reviewable_by?(user)
+    return false unless review_member?(user)
+    return false unless pending_review? || reviewing?
+
+    !current_round_reviews.exists?(user_id: user.id)
+  end
+
   private
 
   # Reviewer・Approverを登録し直す

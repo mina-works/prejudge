@@ -125,11 +125,12 @@
   ) %>
 <% end %>
 
-<%# 作成 %>
-<%= link_to t("common.create"),
-  new_artifact_review_path(
-    @artifact
-  ) %>
+
+<%# レビュー可能なUserにだけレビュー作成リンクを表示する %>
+<% if @artifact.reviewable_by?(current_user) %>
+  <%= link_to t("common.create"),
+              new_artifact_review_path(@artifact) %>
+<% end %>
 
 <%# 編集 %>
 <% if @artifact.editable? %>
