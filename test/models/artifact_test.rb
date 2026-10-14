@@ -1,6 +1,69 @@
 require "test_helper"
 
 class ArtifactTest < ActiveSupport::TestCase
+  test "ReviewerとApproverだけがレビュー担当者である" do
+    artifact = artifacts(:review_create_test_artifact)
+
+    %i[reviewer approver].each do |role|
+      assert artifact.review_member?(users(role)), role.to_s
+    end
+
+    %i[creator unassigned_user].each do |role|
+      assert_not artifact.review_member?(users(role)), role.to_s
+    end
+    assert_not artifact.review_member?(nil)
+  end
+
+  test "ReviewerとApproverだけがレビューを作成できる" do
+    artifact = artifacts(:review_create_test_artifact)
+
+    %i[reviewer approver].each do |role|
+      assert artifact.reviewable_by?(users(role)), role.to_s
+    end
+
+    %i[creator unassigned_user].each do |role|
+      assert_not artifact.reviewable_by?(users(role)), role.to_s
+    end
+    assert_not artifact.reviewable_by?(nil)
+  end
+
+  test "pending_reviewとreviewingだけがレビュー作成可能な状態である" do
+    artifact = artifacts(:review_create_test_artifact)
+
+    Artifact.statuses.each_key do |status|
+      artifact.status = status
+
+      %i[reviewer approver].each do |role|
+        assert_equal %w[pending_review reviewing].include?(status),
+                     artifact.reviewable_by?(users(role)), "#{role}: #{status}"
+      end
+    end
+  end
+
+  test "現在ラウンドでレビュー済みの担当者だけがレビューを作成できない" do
+    artifact = artifacts(:review_create_test_artifact)
+    artifact.reviews.create!(user: users(:reviewer), result: :ok)
+
+    assert_not artifact.reviewable_by?(users(:reviewer))
+    assert artifact.reviewable_by?(users(:approver))
+
+    artifact.reviews.create!(user: users(:approver), result: :uneasy)
+    # 状態による拒否と区別して、Approverのレビュー済み判定も確認する。
+    artifact.status = :reviewing
+    assert_not artifact.reviewable_by?(users(:approver))
+  end
+
+  test "過去ラウンドのレビューは現在ラウンドのレビュー作成を妨げない" do
+    artifact = artifacts(:review_create_test_artifact)
+    artifact.reviews.create!(user: users(:reviewer), result: :ok)
+    artifact.reviews.create!(user: users(:approver), result: :uneasy)
+    artifact.update!(current_round: 2, status: :pending_review)
+
+    %i[reviewer approver].each do |role|
+      assert artifact.reviewable_by?(users(role)), role.to_s
+    end
+  end
+
   test "CreatorはArtifactを閲覧できる" do
     artifact = artifacts(:draft_artifact)
 

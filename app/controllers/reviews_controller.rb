@@ -3,6 +3,9 @@ class ReviewsController < ApplicationController
   before_action :set_artifact,
                 only: [:index, :show, :new, :create]
 
+  before_action :ensure_reviewable,
+              only: %i[new create]
+
   def index
     @reviews = @artifact.reviews
   end
@@ -59,6 +62,15 @@ class ReviewsController < ApplicationController
       :comment,
       issue_types: []
     )
+  end
+
+
+  # レビューを作成できないUserからのアクセスを防ぐ
+  def ensure_reviewable
+    return if @artifact.reviewable_by?(current_user)
+
+    redirect_to artifact_path(@artifact),
+                alert: t("flash.review.not_authorized")
   end
 
 end
