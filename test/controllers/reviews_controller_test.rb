@@ -36,6 +36,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_response :unprocessable_entity
+    assert_redirected_to artifact_path(@artifact)
+    assert_equal I18n.t("flash.review.not_authorized"), flash[:alert]
   end
 end

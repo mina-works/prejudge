@@ -168,7 +168,7 @@ ja:
   flash:
     review:
       created: レビューを作成しました
-      not_authorized: この成果物のレビューを作成する権限がありません
+      not_authorized: 現在、この成果物のレビューは作成できません
 
     artifact:
       created: 成果物を作成しました
