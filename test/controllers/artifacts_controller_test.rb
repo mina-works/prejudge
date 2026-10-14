@@ -241,6 +241,61 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   ## show
+  test "未レビューのReviewerとApproverにはレビュー可能な状態だけ作成リンクを表示する" do
+    artifact = artifacts(:review_create_test_artifact)
+
+    %i[reviewer approver].each do |role|
+      log_in_as(users(role))
+
+      Artifact.statuses.each_key do |status|
+        artifact.update!(status: status)
+
+        get artifact_path(artifact)
+
+        assert_response :success
+        assert_select "a[href=?]", new_artifact_review_path(artifact),
+                      count: %w[pending_review reviewing].include?(status) ? 1 : 0
+      end
+    end
+  end
+
+  test "Creatorにはレビュー可能な状態でもレビュー作成リンクを表示しない" do
+    artifact = artifacts(:review_create_test_artifact)
+    log_in_as(@creator)
+
+    get artifact_path(artifact)
+
+    assert_response :success
+    assert_select "a[href=?]", new_artifact_review_path(artifact), count: 0
+  end
+
+  test "現在ラウンドでレビュー済みの担当者には作成リンクを表示せず次ラウンドで再表示する" do
+    artifact = artifacts(:review_create_test_artifact)
+    artifact.reviews.create!(user: @reviewer, result: :ok)
+    artifact.reviews.create!(user: @approver, result: :uneasy)
+    artifact.update!(status: :reviewing)
+
+    %i[reviewer approver].each do |role|
+      log_in_as(users(role))
+
+      get artifact_path(artifact)
+
+      assert_response :success
+      assert_select "a[href=?]", new_artifact_review_path(artifact), count: 0
+    end
+
+    artifact.update!(current_round: 2, status: :pending_review)
+
+    %i[reviewer approver].each do |role|
+      log_in_as(users(role))
+
+      get artifact_path(artifact)
+
+      assert_response :success
+      assert_select "a[href=?]", new_artifact_review_path(artifact), count: 1
+    end
+  end
+
   test "CreatorはArtifact詳細画面を閲覧できる" do
     log_in_as(@creator)
 
@@ -275,6 +330,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select "p", text: "閲覧許可がありません"
+    assert_select "a[href=?]", new_artifact_review_path(@artifact), count: 0
   end
 
   ## create
