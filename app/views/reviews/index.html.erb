@@ -1,12 +1,16 @@
 <h1><%= t(".title") %></h1>
 
-<% @reviews.each do |review| %>
-  <div>
-    <%= link_to review.id,
-      [review.artifact, review] %>
+<% if @reviews.any? %>
+  <% @reviews.each do |review| %>
+    <div>
+      <%= link_to review.id,
+                  [review.artifact, review] %>
 
-    <%= review.result_label %>
-  </div>
+      <%= review.result_label %>
+    </div>
+  <% end %>
+<% else %>
+  <p><%= t(".empty") %></p>
 <% end %>
 
 <%= link_to t("common.back"),

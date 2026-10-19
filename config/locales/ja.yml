@@ -83,6 +83,7 @@ ja:
   reviews:
     index:
       title: レビュー一覧
+      empty: レビューはまだありません
 
     show:
       title: レビュー詳細
