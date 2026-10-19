@@ -81,7 +81,13 @@
   <%= @artifact.review_deadline %>
 </p>
 
-<h3><%= link_to t("reviews.index.title"), artifact_reviews_path(@artifact) %></h3>
+<%# 下書き以外の場合にReview一覧へのリンクを表示する %>
+<% unless @artifact.draft? %>
+  <h3>
+    <%= link_to t("reviews.index.title"),
+                artifact_reviews_path(@artifact) %>
+  </h3>
+<% end %>
 
 <table>
   <thead>

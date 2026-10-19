@@ -1,10 +1,15 @@
 class ReviewsController < ApplicationController
 
   before_action :set_artifact,
-                only: [:index, :show, :new, :create]
+                only: %i[index show new create]
 
+  # Reviewの閲覧権限を確認する
+  before_action :ensure_viewable,
+                only: %i[index show]
+
+  # Reviewの作成権限を確認する
   before_action :ensure_reviewable,
-              only: %i[new create]
+                only: %i[new create]
 
   def index
     @reviews = @artifact.reviews
@@ -71,6 +76,14 @@ class ReviewsController < ApplicationController
 
     redirect_to artifact_path(@artifact),
                 alert: t("flash.review.not_authorized")
+  end
+
+  # Reviewを閲覧できないUserからのアクセスを防ぐ
+  def ensure_viewable
+    return if @artifact.viewable_by?(current_user)
+
+    redirect_to artifacts_path,
+                alert: t("flash.artifact.ensure_viewable")
   end
 
 end
