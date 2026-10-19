@@ -241,6 +241,33 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   ## show
+  test "draftではReview一覧リンクを表示しない" do
+    log_in_as(@creator)
+
+    get artifact_path(@artifact)
+
+    assert_response :success
+    assert_select "a[href=?]", artifact_reviews_path(@artifact), count: 0
+  end
+
+  test "draft以外ではReviewが0件でもReview一覧リンクを表示する" do
+    artifact = artifacts(:review_create_test_artifact)
+    assert_empty artifact.reviews
+
+    %i[creator reviewer approver].each do |role|
+      log_in_as(users(role))
+
+      %i[pending_review reviewing revision_required reviewed].each do |status|
+        artifact.update!(status: status)
+
+        get artifact_path(artifact)
+
+        assert_response :success
+        assert_select "a[href=?]", artifact_reviews_path(artifact), count: 1
+      end
+    end
+  end
+
   test "未レビューのReviewerとApproverにはレビュー可能な状態だけ作成リンクを表示する" do
     artifact = artifacts(:review_create_test_artifact)
 
