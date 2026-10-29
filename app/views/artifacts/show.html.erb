@@ -114,7 +114,8 @@
 </table>
 
 <%# 提出 %>
-<% if @artifact.draft? %>
+<%# Creatorかつ提出可能な状態の場合のみ表示する %>
+<% if @artifact.creator == current_user && @artifact.submittable? %>
   <%= button_to(
     t(".submit"),
     submit_artifact_path(@artifact),
@@ -123,7 +124,7 @@
 <% end %>
 
 <%# 再提出 %>
-<% if @artifact.revision_required? %>
+<% if @artifact.creator == current_user && @artifact.resubmittable? %>
   <%= button_to(
     t(".resubmit"),
     resubmit_artifact_path(@artifact),
@@ -139,21 +140,23 @@
 <% end %>
 
 <%# 編集 %>
-<% if @artifact.editable? %>
+<% if @artifact.creator == current_user && @artifact.editable? %>
   <%= link_to t("common.edit"),
     edit_artifact_path(@artifact) %>
 <% end %>
 
-<%# 削除 %>
-<% if @artifact.deletable? %>
-  <%= button_to t(".destroy"),
-                artifact_path(@artifact),
-                method: :delete,
-                data: {
-                  turbo_confirm: t(".destroy_confirm")
-                } %>
-<% else %>
-  <p><%= t(".cannot_delete_description") %></p>
+<%# 削除：Creatorのみに表示する %>
+<% if @artifact.creator == current_user %>
+  <% if @artifact.deletable? %>
+    <%= button_to t(".destroy"),
+                  artifact_path(@artifact),
+                  method: :delete,
+                  data: {
+                    turbo_confirm: t(".destroy_confirm")
+                  } %>
+  <% else %>
+    <p><%= t(".cannot_delete_description") %></p>
+  <% end %>
 <% end %>
 
 <%# 一覧へ戻る %>
