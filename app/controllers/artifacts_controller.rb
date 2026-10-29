@@ -172,7 +172,7 @@ class ArtifactsController < ApplicationController
   def ensure_creator
     return if @artifact.creator == current_user
 
-    redirect_to @artifact,
+    redirect_to artifacts_path,
                 alert: t("flash.artifact.not_authorized")
   end
 

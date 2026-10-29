@@ -214,16 +214,16 @@ class Artifact < ApplicationRecord
     end
   end
 
-    # 指定されたUserがArtifactを閲覧できるか判定する
-    def viewable_by?(user)
-      return false if user.nil?
+  # 指定されたUserがArtifactを閲覧できるか判定する
+  def viewable_by?(user)
+    return false if user.nil?
 
-      # draftはCreatorのみ閲覧可能
-      return creator == user if draft?
+    # draftはCreatorのみ閲覧可能
+    return creator == user if draft?
 
-      # draft以外はCreator・Reviewer・Approverが閲覧可能
-      creator == user || review_member?(user)
-    end
+    # draft以外はCreator・Reviewer・Approverが閲覧可能
+    creator == user || review_member?(user)
+  end
 
   # 指定されたUserが、このArtifactのReviewerまたはApproverか判定する
   def review_member?(user)
