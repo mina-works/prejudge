@@ -274,14 +274,14 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     %i[reviewer approver].each do |role|
       log_in_as(users(role))
 
-      Artifact.statuses.each_key do |status|
+      %i[pending_review reviewing revision_required reviewed].each do |status|
         artifact.update!(status: status)
 
         get artifact_path(artifact)
 
         assert_response :success
         assert_select "a[href=?]", new_artifact_review_path(artifact),
-                      count: %w[pending_review reviewing].include?(status) ? 1 : 0
+                      count: %i[pending_review reviewing].include?(status) ? 1 : 0
       end
     end
   end
@@ -323,41 +323,92 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "CreatorはArtifact詳細画面を閲覧できる" do
+  test "Creatorはステータスに関係なくArtifact詳細画面を閲覧できる" do
     log_in_as(@creator)
 
-    get artifact_path(@artifact)
+    Artifact.statuses.each_key do |status|
+      @artifact.update!(status: status)
 
-    assert_response :success
+      get artifact_path(@artifact)
+
+      assert_response :success
+      assert_select "h1", text: I18n.t("artifacts.show.title")
+    end
   end
 
-  test "ReviewerはArtifact詳細画面を閲覧できる" do
-    log_in_as(@reviewer)
+  %i[reviewer approver].each do |role|
+    test "#{role}はdraftのArtifact詳細画面を閲覧できない" do
+      log_in_as(users(role))
 
-    get artifact_path(@artifact)
+      get artifact_path(@artifact)
 
-    assert_response :success
+      assert_redirected_to artifacts_path
+      assert_equal I18n.t("flash.artifact.ensure_viewable"), flash[:alert]
+
+      follow_redirect!
+
+      assert_response :success
+      assert_select "p", text: "閲覧許可がありません"
+    end
+
+    test "#{role}はdraft以外のArtifact詳細画面を閲覧できるがCreator用の操作と削除不可説明文を表示しない" do
+      log_in_as(users(role))
+
+      %i[pending_review reviewing revision_required reviewed].each do |status|
+        @artifact.update!(status: status)
+
+        get artifact_path(@artifact)
+
+        assert_response :success
+        assert_select "h1", text: I18n.t("artifacts.show.title")
+        assert_select "form[action=?] button", submit_artifact_path(@artifact), count: 0
+        assert_select "form[action=?] button", resubmit_artifact_path(@artifact), count: 0
+        assert_select "a[href=?]", edit_artifact_path(@artifact), count: 0
+        assert_select "form[action=?] button", artifact_path(@artifact), count: 0
+        assert_select "p", text: I18n.t("artifacts.show.cannot_delete_description"), count: 0
+      end
+    end
   end
 
-  test "ApproverはArtifact詳細画面を閲覧できる" do
-    log_in_as(@approver)
-
-    get artifact_path(@artifact)
-
-    assert_response :success
-  end
-
-  test "関係のないUserはArtifact詳細画面を閲覧できない" do
+  test "関係のないUserはステータスに関係なくArtifact詳細画面を閲覧できない" do
     log_in_as(users(:unassigned_user))
 
-    get artifact_path(@artifact)
+    Artifact.statuses.each_key do |status|
+      @artifact.update!(status: status)
 
-    assert_redirected_to artifacts_path
-    assert_equal I18n.t("flash.artifact.ensure_viewable"), flash[:alert]
+      get artifact_path(@artifact)
 
-    follow_redirect!
-    assert_select "p", text: "閲覧許可がありません"
-    assert_select "a[href=?]", new_artifact_review_path(@artifact), count: 0
+      assert_redirected_to artifacts_path
+      assert_equal I18n.t("flash.artifact.ensure_viewable"), flash[:alert]
+
+      follow_redirect!
+
+      assert_response :success
+      assert_select "p", text: "閲覧許可がありません"
+      assert_select "a[href=?]", new_artifact_review_path(@artifact), count: 0
+    end
+  end
+
+  {
+    draft: [1, 0, 1, 1, 0],
+    pending_review: [0, 0, 0, 0, 1],
+    reviewing: [0, 0, 0, 0, 1],
+    revision_required: [0, 1, 1, 0, 1],
+    reviewed: [0, 0, 0, 0, 1]
+  }.each do |status, (submit_count, resubmit_count, edit_count, destroy_count, description_count)|
+    test "Creatorには#{status}に応じた操作と削除不可説明文を表示する" do
+      log_in_as(@creator)
+      @artifact.update!(status: status)
+
+      get artifact_path(@artifact)
+
+      assert_response :success
+      assert_select "form[action=?] button", submit_artifact_path(@artifact), count: submit_count
+      assert_select "form[action=?] button", resubmit_artifact_path(@artifact), count: resubmit_count
+      assert_select "a[href=?]", edit_artifact_path(@artifact), count: edit_count
+      assert_select "form[action=?] button", artifact_path(@artifact), count: destroy_count
+      assert_select "p", text: I18n.t("artifacts.show.cannot_delete_description"), count: description_count
+    end
   end
 
   ## create
@@ -474,7 +525,8 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     get edit_artifact_path(@artifact)
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to artifacts_path
+    assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
   end
 
   ## update
@@ -598,7 +650,8 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
       )
     }
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to artifacts_path
+    assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
 
     @artifact.reload
     assert_equal original_title, @artifact.title
@@ -711,7 +764,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     patch submit_artifact_path(@artifact)
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to artifacts_path
     assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
     assert_equal original_status, @artifact.reload.status
   end
@@ -795,7 +848,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
 
     patch resubmit_artifact_path(@revision_required_artifact)
 
-    assert_redirected_to artifact_path(@revision_required_artifact)
+    assert_redirected_to artifacts_path
     assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
 
     @revision_required_artifact.reload
@@ -872,7 +925,7 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
       delete artifact_url(@artifact)
     end
 
-    assert_redirected_to artifact_url(@artifact)
+    assert_redirected_to artifacts_url
     assert_equal I18n.t("flash.artifact.not_authorized"), flash[:alert]
     assert Artifact.exists?(@artifact.id)
   end
