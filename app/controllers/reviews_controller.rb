@@ -69,12 +69,14 @@ class ReviewsController < ApplicationController
     )
   end
 
-
-  # レビューを作成できないUserからのアクセスを防ぐ
   def ensure_reviewable
     return if @artifact.reviewable_by?(current_user)
 
-    redirect_to artifact_path(@artifact),
+    # レビューを作成できないUserからのアクセスを防ぐ
+    destination = @artifact.viewable_by?(current_user) ?
+                    artifact_path(@artifact) : artifacts_path
+
+    redirect_to destination,
                 alert: t("flash.review.not_authorized")
   end
 
