@@ -170,7 +170,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       %i[draft revision_required reviewed].each do |status|
         @artifact.update!(status: status)
 
-        assert_review_creation_denied
+        expected_redirect = status == :draft ? artifacts_path : artifact_path(@artifact)
+        assert_review_creation_denied(expected_redirect: expected_redirect)
       end
     end
 
@@ -206,7 +207,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     test "#{role}はURLを直接指定してもnewとcreateを実行できない" do
       log_in_as(users(role))
 
-      assert_review_creation_denied
+      expected_redirect = role == :unassigned_user ? artifacts_path : artifact_path(@artifact)
+      assert_review_creation_denied(expected_redirect: expected_redirect)
     end
   end
 
@@ -227,14 +229,18 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def assert_review_creation_denied
+  def assert_review_creation_denied(expected_redirect: artifact_path(@artifact))
     original_status = @artifact.reload.status
     original_round = @artifact.current_round
 
-    get new_artifact_review_path(@artifact)
+    assert_no_difference(["Review.count", "ReviewIssue.count"]) do
+      get new_artifact_review_path(@artifact)
+    end
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to expected_redirect
     assert_equal I18n.t("flash.review.not_authorized"), flash[:alert]
+    assert_equal original_status, @artifact.reload.status
+    assert_equal original_round, @artifact.current_round
 
     assert_no_difference(["Review.count", "ReviewIssue.count"]) do
       post artifact_reviews_path(@artifact), params: {
@@ -242,7 +248,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to expected_redirect
     assert_equal I18n.t("flash.review.not_authorized"), flash[:alert]
     assert_equal original_status, @artifact.reload.status
     assert_equal original_round, @artifact.current_round

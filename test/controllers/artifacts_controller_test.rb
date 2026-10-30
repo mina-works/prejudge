@@ -390,12 +390,42 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   {
-    draft: [1, 0, 1, 1, 0],
-    pending_review: [0, 0, 0, 0, 1],
-    reviewing: [0, 0, 0, 0, 1],
-    revision_required: [0, 1, 1, 0, 1],
-    reviewed: [0, 0, 0, 0, 1]
-  }.each do |status, (submit_count, resubmit_count, edit_count, destroy_count, description_count)|
+    draft: {
+      submit: 1,
+      resubmit: 0,
+      edit: 1,
+      destroy: 1,
+      cannot_delete_description: 0
+    },
+    pending_review: {
+      submit: 0,
+      resubmit: 0,
+      edit: 0,
+      destroy: 0,
+      cannot_delete_description: 1
+    },
+    reviewing: {
+      submit: 0,
+      resubmit: 0,
+      edit: 0,
+      destroy: 0,
+      cannot_delete_description: 1
+    },
+    revision_required: {
+      submit: 0,
+      resubmit: 1,
+      edit: 1,
+      destroy: 0,
+      cannot_delete_description: 1
+    },
+    reviewed: {
+      submit: 0,
+      resubmit: 0,
+      edit: 0,
+      destroy: 0,
+      cannot_delete_description: 1
+    }
+  }.each do |status, expected_counts|
     test "Creatorには#{status}に応じた操作と削除不可説明文を表示する" do
       log_in_as(@creator)
       @artifact.update!(status: status)
@@ -403,11 +433,12 @@ class ArtifactsControllerTest < ActionDispatch::IntegrationTest
       get artifact_path(@artifact)
 
       assert_response :success
-      assert_select "form[action=?] button", submit_artifact_path(@artifact), count: submit_count
-      assert_select "form[action=?] button", resubmit_artifact_path(@artifact), count: resubmit_count
-      assert_select "a[href=?]", edit_artifact_path(@artifact), count: edit_count
-      assert_select "form[action=?] button", artifact_path(@artifact), count: destroy_count
-      assert_select "p", text: I18n.t("artifacts.show.cannot_delete_description"), count: description_count
+      assert_select "form[action=?] button", submit_artifact_path(@artifact), count: expected_counts.fetch(:submit)
+      assert_select "form[action=?] button", resubmit_artifact_path(@artifact), count: expected_counts.fetch(:resubmit)
+      assert_select "a[href=?]", edit_artifact_path(@artifact), count: expected_counts.fetch(:edit)
+      assert_select "form[action=?] button", artifact_path(@artifact), count: expected_counts.fetch(:destroy)
+      assert_select "p", text: I18n.t("artifacts.show.cannot_delete_description"),
+                    count: expected_counts.fetch(:cannot_delete_description)
     end
   end
 
