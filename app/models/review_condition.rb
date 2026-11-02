@@ -1,7 +1,7 @@
 class ReviewCondition < ApplicationRecord
   belongs_to :artifact
 
-  enum target: {
+  enum :target, {
     students: 0,
     job_seekers: 1,
     local_government_staff: 2,
@@ -11,7 +11,7 @@ class ReviewCondition < ApplicationRecord
     internal_members: 6
   }
 
-  enum tone: {
+  enum :tone, {
     serious: 0,
     friendly: 1,
     warm: 2,

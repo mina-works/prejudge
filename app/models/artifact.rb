@@ -13,7 +13,7 @@ class Artifact < ApplicationRecord
   accepts_nested_attributes_for :review_condition
 
   
-  enum status: {
+  enum :status, {
     draft: 0,
     pending_review: 1,
     reviewing: 2,
