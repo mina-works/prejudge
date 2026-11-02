@@ -64,28 +64,52 @@ class ArtifactTest < ActiveSupport::TestCase
     end
   end
 
-  test "CreatorはArtifactを閲覧できる" do
+  test "Creatorはステータスに関係なくArtifactを閲覧できる" do
     artifact = artifacts(:draft_artifact)
 
-    assert artifact.viewable_by?(users(:creator))
+    Artifact.statuses.each_key do |status|
+      artifact.status = status
+
+      assert artifact.viewable_by?(users(:creator)), status
+    end
   end
 
-  test "ReviewerはArtifactを閲覧できる" do
-    artifact = artifacts(:draft_artifact)
+  %i[reviewer approver].each do |role|
+    test "#{role}はdraftのArtifactを閲覧できない" do
+      artifact = artifacts(:draft_artifact)
 
-    assert artifact.viewable_by?(users(:reviewer))
+      assert_not artifact.viewable_by?(users(role))
+    end
+
+    test "#{role}はdraft以外のArtifactを閲覧できる" do
+      artifact = artifacts(:draft_artifact)
+
+      %i[pending_review reviewing revision_required reviewed].each do |status|
+        artifact.status = status
+
+        assert artifact.viewable_by?(users(role)), status.to_s
+      end
+    end
   end
 
-  test "ApproverはArtifactを閲覧できる" do
+  test "関係のないUserはステータスに関係なくArtifactを閲覧できない" do
     artifact = artifacts(:draft_artifact)
 
-    assert artifact.viewable_by?(users(:approver))
+    Artifact.statuses.each_key do |status|
+      artifact.status = status
+
+      assert_not artifact.viewable_by?(users(:unassigned_user)), status
+    end
   end
 
-  test "関係のないUserはArtifactを閲覧できない" do
+  test "未ログインUserはステータスに関係なくArtifactを閲覧できない" do
     artifact = artifacts(:draft_artifact)
 
-    assert_not artifact.viewable_by?(users(:unassigned_user))
+    Artifact.statuses.each_key do |status|
+      artifact.status = status
+
+      assert_not artifact.viewable_by?(nil), status
+    end
   end
 
   test "ReviewConditionがないArtifactはinvalid" do

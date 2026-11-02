@@ -214,11 +214,15 @@ class Artifact < ApplicationRecord
     end
   end
 
-  # artifactのcreator・reviewer・approver以外は閲覧不可
+  # 指定されたUserがArtifactを閲覧できるか判定する
   def viewable_by?(user)
-    creator == user ||
-      reviewer_ids.map(&:to_s).include?(user.id.to_s) ||
-      approver_id.to_s == user.id.to_s
+    return false if user.nil?
+
+    # draftはCreatorのみ閲覧可能
+    return creator == user if draft?
+
+    # draft以外はCreator・Reviewer・Approverが閲覧可能
+    creator == user || review_member?(user)
   end
 
   # 指定されたUserが、このArtifactのReviewerまたはApproverか判定する

@@ -5,12 +5,52 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     @artifact = artifacts(:review_create_test_artifact)
   end
 
-  %i[creator reviewer approver].each do |role|
-    test "#{role}はステータスに関係なくReview一覧と詳細を閲覧できる" do
+  test "Creatorはステータスに関係なくReview一覧と詳細を閲覧できる" do
+    review = @artifact.reviews.create!(user: users(:reviewer), result: :ok, comment: "閲覧対象レビュー")
+    log_in_as(users(:creator))
+
+    Artifact.statuses.each_key do |status|
+      @artifact.update!(status: status)
+
+      get artifact_reviews_path(@artifact)
+
+      assert_response :success
+      assert_select "a[href=?]", artifact_review_path(@artifact, review), count: 1
+      assert_select "p", text: "レビューはまだありません", count: 0
+
+      get artifact_review_path(@artifact, review)
+
+      assert_response :success
+      assert_select "p", text: /閲覧対象レビュー/
+    end
+  end
+
+  %i[reviewer approver].each do |role|
+    test "#{role}はdraftのReview一覧と詳細を閲覧できない" do
+      review = @artifact.reviews.create!(user: users(:reviewer), result: :ok, comment: "閲覧対象レビュー")
+      @artifact.update!(status: :draft)
+      log_in_as(users(role))
+
+      [artifact_reviews_path(@artifact), artifact_review_path(@artifact, review)].each do |path|
+        get path
+
+        assert_redirected_to artifacts_path
+        assert_equal I18n.t("flash.artifact.ensure_viewable"), flash[:alert]
+
+        follow_redirect!
+
+        assert_response :success
+        assert_select "p", text: "閲覧許可がありません"
+        assert_select "a[href=?]", artifact_review_path(@artifact, review), count: 0
+        assert_select "p", text: /閲覧対象レビュー/, count: 0
+      end
+    end
+
+    test "#{role}はdraft以外のReview一覧と詳細を閲覧できる" do
       review = @artifact.reviews.create!(user: users(:reviewer), result: :ok, comment: "閲覧対象レビュー")
       log_in_as(users(role))
 
-      Artifact.statuses.each_key do |status|
+      %i[pending_review reviewing revision_required reviewed].each do |status|
         @artifact.update!(status: status)
 
         get artifact_reviews_path(@artifact)
@@ -25,7 +65,9 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
         assert_select "p", text: /閲覧対象レビュー/
       end
     end
+  end
 
+  %i[creator reviewer approver].each do |role|
     test "#{role}は過去ラウンドのReviewも一覧と詳細で閲覧できる" do
       previous_review = @artifact.reviews.create!(user: users(:reviewer), result: :ok, comment: "過去ラウンドのレビュー")
       @artifact.update!(current_round: 2, status: :pending_review)
@@ -128,7 +170,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       %i[draft revision_required reviewed].each do |status|
         @artifact.update!(status: status)
 
-        assert_review_creation_denied
+        expected_redirect = status == :draft ? artifacts_path : artifact_path(@artifact)
+        assert_review_creation_denied(expected_redirect: expected_redirect)
       end
     end
 
@@ -164,7 +207,8 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     test "#{role}はURLを直接指定してもnewとcreateを実行できない" do
       log_in_as(users(role))
 
-      assert_review_creation_denied
+      expected_redirect = role == :unassigned_user ? artifacts_path : artifact_path(@artifact)
+      assert_review_creation_denied(expected_redirect: expected_redirect)
     end
   end
 
@@ -185,14 +229,18 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def assert_review_creation_denied
+  def assert_review_creation_denied(expected_redirect: artifact_path(@artifact))
     original_status = @artifact.reload.status
     original_round = @artifact.current_round
 
-    get new_artifact_review_path(@artifact)
+    assert_no_difference(["Review.count", "ReviewIssue.count"]) do
+      get new_artifact_review_path(@artifact)
+    end
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to expected_redirect
     assert_equal I18n.t("flash.review.not_authorized"), flash[:alert]
+    assert_equal original_status, @artifact.reload.status
+    assert_equal original_round, @artifact.current_round
 
     assert_no_difference(["Review.count", "ReviewIssue.count"]) do
       post artifact_reviews_path(@artifact), params: {
@@ -200,7 +248,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to artifact_path(@artifact)
+    assert_redirected_to expected_redirect
     assert_equal I18n.t("flash.review.not_authorized"), flash[:alert]
     assert_equal original_status, @artifact.reload.status
     assert_equal original_round, @artifact.current_round
