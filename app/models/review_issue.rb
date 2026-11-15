@@ -1,7 +1,7 @@
 class ReviewIssue < ApplicationRecord
   belongs_to :review
 
-  enum issue_type: {
+  enum :issue_type, {
     wrong_atmosphere: 0,
     wrong_target: 1,
     tone_mismatch: 2,
