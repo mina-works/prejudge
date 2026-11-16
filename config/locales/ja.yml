@@ -56,6 +56,7 @@ ja:
     logout: ログアウト
     review_condition: レビュー条件
     artifact: 成果物
+    review_round: 第%{round}回
 
   artifacts:
     index:
@@ -83,7 +84,7 @@ ja:
   reviews:
     index:
       title: レビュー一覧
-      empty: レビューはまだありません
+      empty: 閲覧できるレビューはまだありません
 
     show:
       title: レビュー詳細

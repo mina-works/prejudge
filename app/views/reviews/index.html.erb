@@ -1,13 +1,28 @@
 <h1><%= t(".title") %></h1>
 
-<% if @reviews.any? %>
-  <% @reviews.each do |review| %>
-    <div>
-      <%= link_to review.id,
-                  [review.artifact, review] %>
-
-      <%= review.result_label %>
-    </div>
+<% if @reviews_by_round.any? %>
+  <% @reviews_by_round.each do |round, reviews| %>
+    <section>
+      <h2><%= t("common.review_round", round: round) %></h2>
+      <table>
+        <thead>
+          <tr>
+            <th><%= Review.human_attribute_name(:user) %></th>
+            <th><%= Review.human_attribute_name(:result) %></th>
+            <th><%= Review.human_attribute_name(:comment) %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reviews.each do |review| %>
+            <tr>
+              <td><%= link_to review.user.name, [@artifact, review] %></td>
+              <td><%= review.result_label %></td>
+              <td><%= review.comment %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </section>
   <% end %>
 <% else %>
   <p><%= t(".empty") %></p>

@@ -32,8 +32,7 @@ class Review < ApplicationRecord
   before_validation :set_round
 
 
-  # approverのreview結果に応じてartifact.statusを更新する
-  # reviewerのreviewはstatusに影響しない
+  # 全員の提出状況とApproverの結果に応じてArtifactの状態を更新する
   after_create :update_artifact_status
 
 

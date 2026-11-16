@@ -50,7 +50,7 @@ class ArtifactsController < ApplicationController
 
   def show
     @reviews_by_round =
-      @artifact.reviews.group_by(&:round)
+      @artifact.viewable_reviews(current_user).order(:round).group_by(&:round)
   end
 
   def new

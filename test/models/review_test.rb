@@ -109,27 +109,19 @@ class ReviewTest < ActiveSupport::TestCase
     assert_predicate @artifact.reload, :revision_required?
   end
 
-  test "Approverが先にReviewしてもReviewer完了まではreviewingのままになる" do
-    approver_review = @artifact.reviews.build(
-      user: @approver,
-      result: :ok
-    )
+  { ok: :reviewed, uneasy: :revision_required, ng: :revision_required }.each do |result, final_status|
+    test "Approverが先に#{result}を提出してもReviewer全員の提出で初めて#{final_status}になる" do
+      second_reviewer = users(:unassigned_user)
+      @artifact.artifact_reviewers.create!(user: second_reviewer, role: :reviewer)
+      @artifact.reviews.build(user: @approver, result: result).save_with_review_issues!([])
+      assert_predicate @artifact.reload, :reviewing?
 
-    approver_review.save_with_review_issues!([])
+      @artifact.reviews.build(user: @reviewer, result: :ok).save_with_review_issues!([])
+      assert_predicate @artifact.reload, :reviewing?
 
-    # Approverが完了していてもReviewerが未完了なので、
-    # 最終状態には遷移しない
-    assert_predicate @artifact.reload, :reviewing?
-
-    reviewer_review = @artifact.reviews.build(
-      user: @reviewer,
-      result: :ok
-    )
-
-    reviewer_review.save_with_review_issues!([])
-
-    # Reviewerも完了した時点でreviewedになる
-    assert_predicate @artifact.reload, :reviewed?
+      @artifact.reviews.build(user: second_reviewer, result: :ok).save_with_review_issues!([])
+      assert_equal final_status.to_s, @artifact.reload.status
+    end
   end
 
   test "ReviewIssueの保存に失敗した場合はReviewと状態遷移をロールバックする" do
@@ -151,6 +143,33 @@ class ReviewTest < ActiveSupport::TestCase
     # Review作成後のコールバックで一度状態更新処理が呼ばれても、
     # 同じトランザクション内なのでDB上の変更は元に戻る
     assert_predicate @artifact.reload, :pending_review?
+  end
+
+  test "最後の提出でReviewIssueの保存に失敗するとReviewと最終状態への遷移をロールバックする" do
+    submitted_review = @artifact.reviews.build(user: @reviewer, result: :uneasy)
+    submitted_review.save_with_review_issues!(%w[tone_mismatch])
+    assert_predicate @artifact.reload, :reviewing?
+
+    final_review = @artifact.reviews.build(user: @approver, result: :ok)
+
+    assert_no_difference(["Review.count", "ReviewIssue.count"]) do
+      error = assert_raises(ActiveRecord::RecordInvalid) do
+        final_review.save_with_review_issues!(%w[wrong_atmosphere])
+      end
+
+      assert_instance_of ReviewIssue, error.record
+      assert_same final_review, error.record.review
+      assert_includes error.record.errors[:base], I18n.t("errors.review_issue.review_is_ok")
+    end
+
+    # after_createによる更新はメモリ上に残るが、DBには保存されない
+    assert_predicate @artifact, :reviewed?
+    assert_predicate @artifact.reload, :reviewing?
+    assert_equal [submitted_review.id], @artifact.current_round_reviews.ids
+    assert_equal ["tone_mismatch"], submitted_review.reload.review_issues.pluck(:issue_type)
+
+    @artifact.reviews.build(user: @approver, result: :ok).save_with_review_issues!([])
+    assert_predicate @artifact.reload, :reviewed?
   end
 
   test "レビューできない状態のエラーを内容に合った日本語で表示する" do
