@@ -103,7 +103,7 @@
   <tbody>
     <% @reviews_by_round.each do |round, reviews| %>
       <tr>
-        <td>第<%= round %>回</td>
+        <td><%= t("common.review_round", round: round) %></td>
         <td><%= reviews.count %></td>
         <td><%= reviews.count(&:ok?) %></td>
         <td><%= reviews.count(&:uneasy?) %></td>

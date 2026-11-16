@@ -225,6 +225,17 @@ class Artifact < ApplicationRecord
     creator == user || review_member?(user)
   end
 
+  # Creatorと現在ラウンドの提出者は、現在ラウンドも閲覧できる
+  def viewable_reviews(user)
+    return reviews.none unless viewable_by?(user)
+
+    if creator == user || current_round_reviews.exists?(user_id: user.id)
+      reviews.where(round: ..current_round)
+    else
+      reviews.where(round: ...current_round)
+    end
+  end
+
   # 指定されたUserが、このArtifactのReviewerまたはApproverか判定する
   def review_member?(user)
     return false if user.nil?

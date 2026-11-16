@@ -1,6 +1,11 @@
 <h1><%= t(".title") %></h1>
 
 <p>
+  <%= Review.human_attribute_name(:round) %>:
+  <%= t("common.review_round", round: @review.round) %>
+</p>
+
+<p>
   <%= Review.human_attribute_name(:user) %>:
   <%= @review.user.name %>
 </p>

@@ -12,11 +12,14 @@ class ReviewsController < ApplicationController
                 only: %i[new create]
 
   def index
-    @reviews = @artifact.reviews
+    @reviews_by_round = @artifact.viewable_reviews(current_user)
+                                 .includes(:user)
+                                 .order(:round, :created_at, :id)
+                                 .group_by(&:round)
   end
 
   def show
-    @review = @artifact.reviews.find(
+    @review = @artifact.viewable_reviews(current_user).find(
       params[:id]
     )
   end
